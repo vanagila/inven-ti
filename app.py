@@ -1,11 +1,13 @@
 from flask import Flask, render_template, request, redirect, url_for
 from app.controllers.AuthController import auth_bp
 from app.database.connection import init_app
+from flask_migrate import Migrate
 
 app = Flask(__name__, template_folder='app/views', static_folder='app/static')
 app.secret_key = 'inven_ti_key'
 
 db = init_app(app)
+migrate = Migrate(app, db)
 
 app.register_blueprint(auth_bp)
 
