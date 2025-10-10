@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for
 from app.controllers.AuthController import auth_bp
 from app.database.connection import init_app
 
-app = Flask(__name__, template_folder='app/views')
+app = Flask(__name__, template_folder='app/views', static_folder='app/static')
 app.secret_key = 'inven_ti_key'
 
 db = init_app(app)

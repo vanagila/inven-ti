@@ -1,51 +1,51 @@
-<!doctype html>
-<html lang="pt-br">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Cadastrar usuário</title>
-  </head>
-  <body>
-    <h1>Cadastrar usuário</h1>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cadastrar usuário</title>
+</head>
+<body>
+  <h1>Cadastrar usuário</h1>
 
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        <ul>
-          {% for category, message in messages %}
-            <li class="{{ category }}">{{ message }}</li>
-          {% endfor %}
-        </ul>
-      {% endif %}
-    {% endwith %}
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <ul>
+        {% for category, message in messages %}
+          <li class="{{ category }}">{{ message }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+  {% endwith %}
 
-    <form method="post">
-      <label>Nome<br>
-        <input type="text" name="nome" value="{{ dados.nome if dados else '' }}" required>
-      </label><br>
+  <form method="post">
+    <label>Nome<br>
+      <input type="text" name="nome" value="{{ dados.nome if dados else '' }}" required>
+    </label><br>
 
-      <label>Email<br>
-        <input type="email" name="email" value="{{ dados.email if dados else '' }}" required>
-      </label><br>
+    <label>Email<br>
+      <input type="email" name="email" value="{{ dados.email if dados else '' }}" required>
+    </label><br>
 
-      <label>Senha<br>
-        <input type="password" name="senha" required>
-      </label><br>
+    <label>Senha<br>
+      <input type="password" name="senha" required>
+    </label><br>
 
-      <label>Departamento<br>
-        <input type="text" name="departamento" value="{{ dados.departamento if dados else '' }}">
-      </label><br>
+    <label>Departamento<br>
+      <input type="text" name="departamento" value="{{ dados.departamento if dados else '' }}">
+    </label><br>
 
-      <label>Cargo<br>
-        <input type="text" name="cargo" value="{{ dados.cargo if dados else '' }}">
-      </label><br>
+    <label>Cargo<br>
+      <input type="text" name="cargo" value="{{ dados.cargo if dados else '' }}">
+    </label><br>
 
-      <label>
-        <input type="checkbox" name="is_admin" {% if dados and dados.get('is_admin') %}checked{% endif %}> Administrador
-      </label><br>
+    <label>
+      <input type="checkbox" name="is_admin" {% if dados and dados.get('is_admin') %}checked{% endif %}> Administrador
+    </label><br>
 
-      <button type="submit">Cadastrar</button>
-    </form>
+    <button type="submit">Cadastrar</button>
+  </form>
 
-    <p><a href="{{ url_for('auth.login') }}">Ir para login</a></p>
-  </body>
+  <p><a href="{{ url_for('auth.login') }}">Ir para login</a></p>
+</body>
 </html>
