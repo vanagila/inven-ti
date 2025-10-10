@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block title %}Cadastro de Usuário{% endblock %}
+
+{% block header %}
+  {% include 'partials/_header.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="container py-3">
+  <div class="mx-auto bg-white rounded-4 shadow-sm border border-light p-5" style="max-width: 600px;">
+
+    <div class="text-center mb-4">
+      <h2 class="fw-semibold mb-1">Cadastrar Novo Usuário</h2>
+      <p class="text-secondary mb-0">Adicione um novo usuário ao invenTI</p>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ 'success' if category == 'success' else 'danger' }} mb-4" role="alert">
+            <i class="fa-solid fa-circle-info me-2"></i>{{ message }}
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <form method="POST" action="{{ url_for('auth.cadastrar_usuario') }}">
+      
+      <div class="mb-3">
+        <label for="nome" class="form-label">Nome<span class="text-muted">*</span></label>
+        <input type="text" id="nome" name="nome" class="form-control" placeholder="Digite o nome" required>
+      </div>
+
+      <div class="mb-3">
+        <label for="email" class="form-label">Email <span class="text-muted">*</span></label>
+        <input type="email" id="email" name="email" class="form-control" placeholder="Digite o email" required>
+      </div>
+
+      <div class="mb-3">
+        <label for="senha" class="form-label">Senha <span class="text-muted">*</span></label>
+        <input type="password" id="senha" name="senha" class="form-control" placeholder="Crie uma senha" required>
+      </div>
+
+      <div class="mb-3">
+        <label for="departamento" class="form-label">Departamento <span class="text-muted">*</span></label>
+        <input type="text" id="departamento" name="departamento" class="form-control" placeholder="Digite o departamento" required>
+      </div>
+
+      <div class="mb-4">
+        <label for="cargo" class="form-label">Cargo <span class="text-muted">*</span></label>
+        <input type="text" id="cargo" name="cargo" class="form-control" placeholder="Digite o cargo" required>
+      </div>
+
+      <div class="border-top pt-3 mb-4">
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" id="is_admin" name="is_admin">
+          <label class="form-check-label" for="is_admin">
+            Conceder privilégios de administrador
+          </label>
+        </div>
+        <p class="form-text text-muted">
+          Usuários administradores podem gerenciar equipamentos, usuários e configurações do sistema.
+        </p>
+      </div>
+
+      <div class="d-flex justify-content-end gap-3 border-top pt-3">
+        <a href="{{ url_for('auth.cadastrar_usuario') }}" class="btn btn-outline-secondary">Cancelar</a>
+        <button type="submit" class="btn btn-dark">
+          <i class="fa-solid fa-user-plus me-2"></i>Salvar Usuário
+        </button>
+      </div>
+
+    </form>
+  </div>
+</div>
+{% endblock %}
