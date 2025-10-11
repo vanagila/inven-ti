@@ -72,7 +72,7 @@ def login():
             session['is_admin'] = usuario.is_admin
 
             flash(f'Bem vindo(a), {usuario.nome}!', 'success')
-            return redirect(url_for('painel'))
+            return redirect(url_for('auth.login'))
         else:
             flash('Email ou senha incorretos.', 'danger')
 
