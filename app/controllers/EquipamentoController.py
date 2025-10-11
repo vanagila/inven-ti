@@ -1,3 +1,6 @@
+from math import e
+from operator import contains, eq
+from os import error
 from time import strptime
 from flask import Blueprint, request, jsonify, render_template, redirect, url_for, session, flash
 from app.database.connection import db
@@ -52,3 +55,175 @@ def cadastrar_equipamento():
         else:
             flash(f'Erro ao cadastrar equipamento: {str(e)}', 'danger')
             return render_template('equipamentos/cadastro.html', dados=request.form)
+        
+@equipamento_bp.route('/lista', methods=['GET'])
+def listar_equipamentos():
+    try:
+        tipo = request.args.get('tipo')
+        status = request.args.get('status')
+        localizacao = request.args.get('localizacao')
+        marca = request.args.get('marca')
+
+        pesquisa = request.args.get('pesquisa', '').strip()
+
+        page = request.args.get('page', 1, type=int)
+        per_page = request.args.get('per_page',  5, type=int)
+
+        query = Equipamento.query
+
+        if tipo:
+            query = query.filter(Equipamento.tipo.contains(tipo))
+        if status:
+            query = query.filter(Equipamento.status == status)
+        if localizacao:
+            query = query.filter(Equipamento.localizacao.contains(localizacao))
+        if marca:
+            query = query.filter(Equipamento.marca.contains(marca))
+
+        if pesquisa:
+            query = query.filter(
+                db.or_(
+                    Equipamento.patrimonio.contains(pesquisa),
+                    Equipamento.modelo.contains(pesquisa),
+                    Equipamento.numero_serie.contains(pesquisa),
+                    Equipamento.marca.contains(pesquisa)
+                )
+            )
+
+        query = query.order_by(Equipamento.data_cadastro.desc())
+
+        pagination = query.paginate(page=page, per_page=per_page, error_out=False)
+        equipamentos = pagination.items
+
+        if request.is_json:
+            return jsonify({
+                'total': pagination.total,
+                'page': pagination.page,
+                'pages': pagination.pages,
+                'per_page': pagination.per_page,
+                'equipamentos': [eq.to_dict() for eq in equipamentos]
+            }), 200
+        
+        return render_template('equipamentos/lista.html',
+            equipamentos=equipamentos,
+            pagination=pagination,
+            filtros={
+                'tipo': tipo,
+                'status': status,
+                'localizacao': localizacao,
+                'marca': marca,
+                'pesquisa': pesquisa
+            }
+        )
+
+    except Exception as e:
+        db.session.rollback()
+
+        if request.is_json:
+            return jsonify({'erro': str(e)}), 500
+        flash(f'Erro ao listar equipamentos: {str(e)}', 'danger')
+        return render_template('equipamentos/lista.html', equipamentos=[], pagination=None, filtros={})
+
+@equipamento_bp.route('/<int:id>', methods=['GET'])
+def consultar_equipamento(id):
+    try:
+        equipamento = Equipamento.query.get_or_404(id)
+
+        if request.is_json:
+            return jsonify(equipamento.to_dict())
+        else:
+            return render_template('equipamentos/detalhes.html', equipamento=equipamento)
+        
+    except Exception as e:
+        if request.is_json:
+            return jsonify({'erro': str(e)}), 404
+        else:
+            flash('Equipamento não encontrado.' 'danger')
+            return redirect(url_for('equipamento.listar_equipamentos'))
+        
+@equipamento_bp.route('/<int:id>', methods=['PUT', 'POST'])
+def atualizar_equipamento(id):
+    try:
+        equipamento = Equipamento.query.get_or_404(id)
+
+        user_id = session.get('user_id')
+        if not user_id:
+            if request.is_json:
+                return jsonify({'erro': 'Usuário não autenticado'}), 401
+            else:
+                flash('É necessário estar logado.', 'danger')
+                return redirect(url_for('auth.login'))
+
+        if request.is_json:
+            dados = request.get_json()
+        else:
+            dados = request.form.to_dict()
+
+        campos_permitidos = ['localizacao', 'status', 'tipo', 'marca', 'modelo', 'observacoes']
+        campos_atualizados = []
+
+        for campo in campos_permitidos:
+            if campo in dados and dados[campo] is not None:
+                setattr(equipamento, campo, dados[campo])
+                campos_atualizados.append(campo)
+
+        equipamento.atualizar_alteracao(user_id)
+        db.session.commit()
+
+        if request.is_json:
+            return jsonify({
+                'mensagem': 'Equipamento atualizado com sucesso!',
+                'campos_atualizados': campos_atualizados,
+                'equipamento': equipamento.to_dict()
+            })
+        else:
+            flash('Equipamento atualizado com sucesso!', 'success')
+            return redirect(url_for('equipamento.consultar_equipamento', id=id))
+    
+    except Exception as e:
+        db.session.rollback()
+        if request.is_json:
+            return jsonify({'erro': str(e)}), 400
+        else:
+            flash('Erro ao atualizar equipamento.' 'danger')
+            return redirect(url_for('equipamento.consultar_equipamentos', id=id))
+        
+def desativar_equipamento(id):
+    try:
+        equipamento = Equipamento.query.get_or_404(id)
+
+        user_id = session.get('user_id')
+        if not user_id:
+            if request.is_json:
+                return jsonify({'erro': 'Usuário não autenticado'}), 401
+            else:
+                flash('É necessário estar logado.', 'danger')
+                return redirect(url_for('auth.login'))
+        
+        if equipamento.status == 'Desativado':
+            if request.is_json:
+                return jsonify({'erro': 'Equipamento já está desativado'}), 400
+            else:
+                flash('Equipamento já está desativado.' 'warning')
+            return redirect(url_for('equipamento.consultar_equipamentos', id=id))
+        
+        equipamento.status = 'Desativado'
+        equipamento.atualizar_alteracao(user_id)
+        db.session.commit()
+        
+        if request.is_json:
+            return jsonify({
+                'mensagem': 'Equipamento desativado com sucesso!',
+                'equipamento': equipamento.to_dict()
+            })
+        else:
+            flash('Equipamento desativado com sucesso!', 'success')
+            return redirect(url_for('equipamento.listar_equipamentos'))
+    
+    except Exception as e:
+        db.session.rollback()
+        if request.is_json:
+            return jsonify({'erro': str(e)}), 400
+        else:
+            flash(f'Erro ao desativar equipamento: {str(e)}', 'danger')
+            return redirect(url_for('equipamento.consultar_equipamento', id=id))

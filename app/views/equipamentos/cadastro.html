@@ -1,53 +1,52 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-    <form method="POST" action="{{ url_for('equipamento.cadastrar_equipamento') }}">
-        <div class="mb-3">
-            <label for="patrimonio" class="form-label">Patrimônio*</label>
-            <input type="text" class="form-control" id="patrimonio" name="patrimonio" required>
-        </div>
+{% extends "base.html" %}
+{% block title %}Cadastro de Equipamento{% endblock %}
+
+{% block header %}
+  {% include 'partials/_header.html' %}
+{% endblock %}
+
+{% block content %}
+<form method="POST" action="{{ url_for('equipamento.cadastrar_equipamento') }}">
+    <div class="mb-3">
+        <label for="patrimonio" class="form-label">Patrimônio*</label>
+        <input type="text" class="form-control" id="patrimonio" name="patrimonio" required>
+    </div>
         
-        <div class="mb-3">
-            <label for="tipo" class="form-label">Tipo*</label>
-            <select class="form-control" id="tipo" name="tipo" required>
-                <option value="">Selecione...</option>
-                <option value="Notebook">Notebook</option>
-                <option value="Desktop">Desktop</option>
-                <option value="Impressora">Impressora</option>
-            </select>
-        </div>
+    <div class="mb-3">
+        <label for="tipo" class="form-label">Tipo*</label>
+        <select class="form-control" id="tipo" name="tipo" required>
+            <option value="">Selecione...</option>
+            <option value="Notebook">Notebook</option>
+            <option value="Desktop">Desktop</option>
+            <option value="Impressora">Impressora</option>
+        </select>
+    </div>
         
-        <div class="mb-3">
-            <label for="marca" class="form-label">Marca*</label>
-            <input type="text" class="form-control" id="marca" name="marca" required>
-        </div>
+    <div class="mb-3">
+        <label for="marca" class="form-label">Marca*</label>
+        <input type="text" class="form-control" id="marca" name="marca" required>
+    </div>
         
-        <div class="mb-3">
-            <label for="modelo" class="form-label">Modelo*</label>
-            <input type="text" class="form-control" id="modelo" name="modelo" required>
-        </div>
+    <div class="mb-3">
+        <label for="modelo" class="form-label">Modelo*</label>
+        <input type="text" class="form-control" id="modelo" name="modelo" required>
+    </div>
         
-        <div class="mb-3">
-            <label for="numero_serie" class="form-label">Número de Série*</label>
-            <input type="text" class="form-control" id="numero_serie" name="numero_serie" required>
-        </div>
+    <div class="mb-3">
+        <label for="numero_serie" class="form-label">Número de Série*</label>
+        <input type="text" class="form-control" id="numero_serie" name="numero_serie" required>
+    </div>
         
-        <div class="mb-3">
-            <label for="data_aquisicao" class="form-label">Data de Aquisição</label>
-            <input type="date" class="form-control" id="data_aquisicao" name="data_aquisicao">
-        </div>
+    <div class="mb-3">
+        <label for="data_aquisicao" class="form-label">Data de Aquisição</label>
+        <input type="date" class="form-control" id="data_aquisicao" name="data_aquisicao">
+    </div>
         
-        <div class="mb-3">
-            <label for="localizacao" class="form-label">Localização*</label>
-            <input type="text" class="form-control" id="localizacao" name="localizacao" required>
-        </div>
+    <div class="mb-3">
+        <label for="localizacao" class="form-label">Localização*</label>
+        <input type="text" class="form-control" id="localizacao" name="localizacao" required>
+    </div>
         
-        <button type="submit" class="btn btn-primary">Cadastrar Equipamento</button>
-    </form>
-</body>
-</html>
+    <button type="submit" class="btn btn-primary">Cadastrar Equipamento</button>
+</form>
+{% endblock %}

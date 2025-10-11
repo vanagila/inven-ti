@@ -9,12 +9,21 @@ auth_bp = Blueprint('auth', __name__, url_prefix='/auth')
 def cadastrar_usuario():
     if request.method == 'POST':
         try:
-            nome = (request.form.get('nome') or '').strip()
-            email = (request.form.get('email') or '').strip().lower()
-            senha = request.form.get('senha') or ''
-            departamento = (request.form.get('departamento') or '').strip()
-            cargo = (request.form.get('cargo') or '').strip()
-            is_admin = True if request.form.get('is_admin') == 'on' else False
+            if request.is_json:
+                dados = request.get_json()
+                nome = (dados.get('nome') or '').strip()
+                email = (dados.get('email') or '').strip().lower()
+                senha = dados.get('senha') or ''
+                departamento = (dados.get('departamento') or '').strip()
+                cargo = (dados.get('cargo') or '').strip()
+                is_admin = dados.get('is_admin', False)
+            else:
+                nome = (request.form.get('nome') or '').strip()
+                email = (request.form.get('email') or '').strip().lower()
+                senha = request.form.get('senha') or ''
+                departamento = (request.form.get('departamento') or '').strip()
+                cargo = (request.form.get('cargo') or '').strip()
+                is_admin = True if request.form.get('is_admin') == 'on' else False
 
             if not nome or not email or not senha:
                 flash('Nome, email e senha são obrigatórios.', 'danger')
@@ -48,8 +57,14 @@ def cadastrar_usuario():
             db.session.add(usuario)
             db.session.commit()
 
-            flash('Usuário cadastrado com sucesso. Faça login.', 'success')
-            return redirect(url_for('auth.login'))
+            if request.is_json:
+                return jsonify({
+                    'mensagem': 'Usuário cadastrato com sucesso',
+                    'usuario': usuario.to_dict()
+                }), 201
+            else:
+                flash('Usuário cadastrado com sucesso. Faça login.', 'success')
+                return redirect(url_for('auth.login'))
 
         except Exception as e:
             db.session.rollback()
@@ -60,8 +75,13 @@ def cadastrar_usuario():
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        email = request.form.get('email')
-        senha = request.form.get('senha')
+        if request.is_json:
+            dados = request.get_json()
+            email = dados.get('email')
+            senha = dados.get('senha')
+        else:
+            email = request.form.get('email')
+            senha = request.form.get('senha')
 
         usuario = Usuario.query.filter_by(email=email, ativo=True).first()
 
@@ -71,9 +91,19 @@ def login():
             session['user_email'] = usuario.email
             session['is_admin'] = usuario.is_admin
 
-            flash(f'Bem vindo(a), {usuario.nome}!', 'success')
-            return redirect(url_for('auth.login'))
+            if request.is_json:
+                return jsonify({
+                    'mensagem': f'Bem-vindo(a), {usuario.nome}',
+                    'usuario': usuario.to_dict()
+                })
+            else:
+                flash(f'Bem vindo(a), {usuario.nome}!', 'success')
+                return redirect(url_for('auth.login'))
         else:
-            flash('Email ou senha incorretos.', 'danger')
+            mensagem = 'Email ou senha incorretos.'
+            if request.is_json:
+                return jsonify({'erro': mensagem}), 401
+            else:
+                flash(mensagem, 'danger')
 
     return render_template('auth/login.html')
