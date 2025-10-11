@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de equipamentos</title>
+</head>
+<body>
+    <!-- Filtros -->
+    <form method="GET" action="{{ url_for('equipamento.listar_equipamentos') }}">
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <label>Tipo de Equipamento</label>
+                <select name="tipo" class="form-select">
+                    <option value="">Todos os Tipos</option>
+                    <option value="Notebook" {{ 'selected' if filtros.tipo == 'Notebook' }}>Notebook</option>
+                    <option value="Desktop" {{ 'selected' if filtros.tipo == 'Desktop' }}>Desktop</option>
+                    <option value="Impressora" {{ 'selected' if filtros.tipo == 'Impressora' }}>Impressora</option>
+                </select>
+            </div>
+            
+            <div class="col-md-2">
+                <label>Status</label>
+                <select name="status" class="form-select">
+                    <option value="">Todos Status</option>
+                    <option value="Ativo" {{ 'selected' if filtros.status == 'Ativo' }}>Ativo</option>
+                    <option value="Manutenção" {{ 'selected' if filtros.status == 'Manutenção' }}>Manutenção</option>
+                </select>
+            </div>
+            
+            <div class="col-md-2">
+                <label>Local</label>
+                <select name="localizacao" class="form-select">
+                    <option value="">Todos Locais</option>
+                    <option value="1 Andar" {{ 'selected' if filtros.localizacao == '1 Andar' }}>1 Andar</option>
+                    <option value="2 Andar" {{ 'selected' if filtros.localizacao == '2 Andar' }}>2 Andar</option>
+                </select>
+            </div>
+            
+            <div class="col-md-3">
+                <label>Pesquisa</label>
+                <input type="text" name="pesquisa" class="form-control" 
+                    placeholder="Patrimônio, Modelo, Série..." 
+                    value="{{ filtros.pesquisa or '' }}">
+            </div>
+            
+            <div class="col-md-2 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary me-2">Filtrar</button>
+                <a href="{{ url_for('equipamento.listar_equipamentos') }}" 
+                class="btn btn-outline-secondary">Resetar</a>
+            </div>
+        </div>
+    </form>
+
+    <!-- Resultados -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <p class="mb-0">Mostrando {{ pagination.total }} resultados</p>
+    </div>
+
+    <!-- Tabela -->
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Patrimonio</th>
+                <th>Tipo</th>
+                <th>Marca</th>
+                <th>Modelo</th>
+                <th>Local</th>
+                <th>Status</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for equipamento in equipamentos %}
+            <tr>
+                <td>{{ equipamento.patrimonio }}</td>
+                <td>{{ equipamento.tipo }}</td>
+                <td>{{ equipamento.marca }}</td>
+                <td>{{ equipamento.modelo }}</td>
+                <td>{{ equipamento.localizacao }}</td>
+                <td>
+                    <span class="badge bg-{{ 'success' if equipamento.status == 'Ativo' else 'warning' }}">
+                        {{ equipamento.status }}
+                    </span>
+                </td>
+                <td>
+                    <a href="#" class="btn btn-sm btn-outline-primary">👁️</a>
+                    <a href="#" class="btn btn-sm btn-outline-warning">✏️</a>
+                    <a href="#" class="btn btn-sm btn-outline-danger">🗑️</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Paginação -->
+    <nav>
+        <ul class="pagination">
+            {% if pagination.has_prev %}
+            <li class="page-item">
+                <a class="page-link" href="{{ url_for('equipamento.listar_equipamentos', page=pagination.prev_num, **filtros) }}">Anterior</a>
+            </li>
+            {% endif %}
+            
+            {% for page_num in pagination.iter_pages() %}
+            <li class="page-item {{ 'active' if page_num == pagination.page }}">
+                <a class="page-link" href="{{ url_for('equipamento.listar_equipamentos', page=page_num, **filtros) }}">{{ page_num }}</a>
+            </li>
+            {% endfor %}
+            
+            {% if pagination.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="{{ url_for('equipamento.listar_equipamentos', page=pagination.next_num, **filtros) }}">Próxima</a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+
+    <!-- Contador -->
+    <div class="text-center mt-3">
+        <small>
+            Mostrando {{ pagination.page * pagination.per_page - pagination.per_page + 1 }}-{{ [pagination.page * pagination.per_page, pagination.total] | min }} de {{ pagination.total }} resultados
+        </small>
+    </div>
+</body>
+</html>

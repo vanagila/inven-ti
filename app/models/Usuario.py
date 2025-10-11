@@ -16,8 +16,8 @@ class Usuario(db.Model):
     ativo = db.Column(db.Boolean, default=True)
 
     registros_suporte = db.relationship('RegistroSuporte', backref='usuario', lazy=True)
-    equipamentos_cadastrados = db.relationship('Equipamento', foreign_keys='Equipamento.id_usuario_cadastro', backref='usuario_cadastro_rel', lazy=True)
-    equipamentos_alterados = db.relationship('Equipamento', foreign_keys='Equipamento.id_usuario_ultima_alteracao', backref='usuario_alteracao_rel', lazy=True)
+    equipamentos_cadastrados = db.relationship('Equipamento', foreign_keys='Equipamento.id_usuario_cadastro', back_populates='usuario_cadastro', lazy=True)
+    equipamentos_alterados = db.relationship('Equipamento', foreign_keys='Equipamento.id_usuario_ultima_alteracao', back_populates='usuario_ultima_alteracao', lazy=True)
 
     def __init__(self, nome, email, senha, departamento, cargo, is_admin=False):
         self.nome = nome
