@@ -16,6 +16,7 @@
                     <option value="Notebook" {{ 'selected' if filtros.tipo == 'Notebook' }}>Notebook</option>
                     <option value="Desktop" {{ 'selected' if filtros.tipo == 'Desktop' }}>Desktop</option>
                     <option value="Impressora" {{ 'selected' if filtros.tipo == 'Impressora' }}>Impressora</option>
+                    <option value="Servidor" {{ 'selected' if filtros.tipo == 'Servidor' }}>Servidor</option>
                 </select>
             </div>
             
@@ -23,8 +24,10 @@
                 <label>Status</label>
                 <select name="status" class="form-select">
                     <option value="">Todos Status</option>
-                    <option value="Ativo" {{ 'selected' if filtros.status == 'Ativo' }}>Ativo</option>
-                    <option value="Manutenção" {{ 'selected' if filtros.status == 'Manutenção' }}>Manutenção</option>
+                    <option value="Em Uso" {{ 'selected' if filtros.status == 'Em Uso' }}>Em Uso</option>
+                    <option value="Em Manutenção" {{ 'selected' if filtros.status == 'Em Manutenção' }}>Em Manutenção</option>
+                    <option value="Desativado" {{ 'selected' if filtros.status == 'Desativado' }}>Desativado</option>
+                    <option value="Descartado" {{ 'selected' if filtros.status == 'Descartado' }}>Descartado</option>
                 </select>
             </div>
             
@@ -32,7 +35,7 @@
                 <label>Local</label>
                 <select name="localizacao" class="form-select">
                     <option value="">Todos Locais</option>
-                    <option value="1 Andar" {{ 'selected' if filtros.localizacao == '1 Andar' }}>1 Andar</option>
+                    <option value="Sala de Servidores" {{ 'selected' if filtros.localizacao == 'Sala de Servidores' }}>Sala de Servidores</option>
                     <option value="2 Andar" {{ 'selected' if filtros.localizacao == '2 Andar' }}>2 Andar</option>
                 </select>
             </div>
@@ -79,12 +82,12 @@
                 <td>{{ equipamento.modelo }}</td>
                 <td>{{ equipamento.localizacao }}</td>
                 <td>
-                    <span class="badge bg-{{ 'success' if equipamento.status == 'Ativo' else 'warning' }}">
+                    <span class="badge bg-{{ 'success' if equipamento.status == 'Em Uso' else 'warning' if equipamento.status == 'Em Manutenção' else 'secondary' }}">
                         {{ equipamento.status }}
                     </span>
                 </td>
                 <td>
-                    <a href="#" class="btn btn-sm btn-outline-primary">👁️</a>
+                    <a href="{{ url_for('equipamento.consultar_equipamento', id=equipamento.id) }}" class="btn btn-sm btn-outline-primary">👁️</a>
                     <a href="#" class="btn btn-sm btn-outline-warning">✏️</a>
                     <a href="#" class="btn btn-sm btn-outline-danger">🗑️</a>
                 </td>

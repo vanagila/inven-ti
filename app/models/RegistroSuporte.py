@@ -1,5 +1,6 @@
 from app.database.connection import db
 from datetime import datetime, timezone
+from app.models.enums import TipoSuporte
 
 class RegistroSuporte(db.Model):
     __tablename__ = 'registros_suporte'
@@ -9,11 +10,11 @@ class RegistroSuporte(db.Model):
     id_usuario = db.Column(db.Integer, db.ForeignKey('usuarios.id'), nullable=True)
     descricao = db.Column(db.Text, nullable=True)
     data_suporte = db.Column(db.DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
-    tipo_suporte = db.Column(db.String(100), nullable=False)
+    tipo_suporte = db.Column(db.String(100), nullable=False, default=TipoSuporte.MANUTENCAO_CORRETIVA)
     responsavel = db.Column(db.String(255), nullable=False)
     custo = db.Column(db.Numeric(10, 2), default=0.00)
 
-    def __init__(self, id_equipamento, id_usuario, data_suporte, tipo_suporte, descricao, responsavel, custo=0.00):
+    def __init__(self, id_equipamento, id_usuario, descricao, responsavel, data_suporte=None, tipo_suporte=TipoSuporte.MANUTENCAO_CORRETIVA, custo=0.00):
         self.id_equipamento = id_equipamento
         self.id_usuario = id_usuario
         self.data_suporte = data_suporte

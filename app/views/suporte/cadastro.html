@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Registrar Suporte</title>
+</head>
+<body>
+    <h1>Registrar Suporte</h1>
+
+    {% with mensagens = get_flashed_messages(with_categories=true) %}
+      {% if mensagens %}
+        <ul>
+          {% for categoria, msg in mensagens %}
+            <li><strong>{{ categoria }}:</strong> {{ msg }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+
+    <form method="post" action="{{ url_for('registro_suporte.registrar_suporte') }}">
+        <div>
+            <span class="field-label">Equipamento:</span>
+            <div class="readonly-field">
+                {{ equipamento_selecionado.patrimonio }} - {{ equipamento_selecionado.marca }} {{ equipamento_selecionado.modelo }}
+                ({{ equipamento_selecionado.localizacao }})
+            </div>
+            <input type="hidden" name="id_equipamento" value="{{ equipamento_selecionado.id }}">
+        </div><br>
+        
+        <label for="responsavel">Responsável</label>
+        <select id="responsavel" name="responsavel" required>
+            <option value="">Selecionar</option>
+            {% for r in responsaveis %}
+                <option value="{{ r.nome }}">{{ r.nome }}</option>
+            {% endfor %}
+        </select>
+
+        <label for="tipo_suporte">Tipo de Suporte:</label>
+        <select name="tipo_suporte" id="tipo_suporte">
+            <option value="MANUTENCAO_CORRETIVA">Manutenção Corretiva</option>
+            <option value="MANUTENCAO_PREVENTIVA">Manutenção Preventiva</option>
+            <option value="INSTALACAO">Instalação</option>
+            <option value="OUTRO">Outro</option>
+        </select><br><br>
+
+        <label for="data_suporte">Data do Suporte:</label>
+        <input type="date" name="data_suporte" id="data_suporte"
+               value="{{ dados.data_suporte if dados else '' }}"><br><br>
+
+        <label for="descricao">Descrição:</label><br>
+        <textarea name="descricao" id="descricao" rows="4" cols="50">{{ dados.descricao if dados else '' }}</textarea><br><br>
+
+        <label for="custo">Custo (R$):</label>
+        <input type="number" step="0.01" name="custo" id="custo"
+               value="{{ dados.custo if dados else '0.00' }}"><br><br>
+
+        <button type="submit">Salvar Registro</button>
+    </form>
+
+    <p><a href="{{ url_for('auth.login') }}">Voltar ao Painel</a></p>
+</body>
+</html>

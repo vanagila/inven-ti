@@ -1,5 +1,6 @@
 from app.database.connection import db
 from datetime import datetime, timezone
+from app.models.enums import StatusEquipamento
 
 class Equipamento(db.Model):
     __tablename__ = 'equipamentos'
@@ -12,7 +13,7 @@ class Equipamento(db.Model):
     numero_serie = db.Column(db.String(255), unique=True, nullable=False)
     data_aquisicao = db.Column(db.Date, nullable=False)
     localizacao = db.Column(db.String(255), nullable=False)
-    status = db.Column(db.String(50), nullable=False, default='Em Uso')
+    status = db.Column(db.String(50), nullable=False, default=StatusEquipamento.EM_USO)
     observacoes = db.Column(db.Text, nullable=True)
     data_cadastro = db.Column(db.DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
     data_ultima_alteracao = db.Column(db.DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
@@ -23,7 +24,7 @@ class Equipamento(db.Model):
     usuario_cadastro = db.relationship('Usuario', foreign_keys=[id_usuario_cadastro], back_populates='equipamentos_cadastrados')
     usuario_ultima_alteracao = db.relationship('Usuario', foreign_keys=[id_usuario_ultima_alteracao], back_populates='equipamentos_alterados')
 
-    def __init__(self, patrimonio, tipo, marca, modelo, numero_serie, data_aquisicao, localizacao, id_usuario_cadastro, status='Em Uso', observacoes=None):
+    def __init__(self, patrimonio, tipo, marca, modelo, numero_serie, data_aquisicao, localizacao, id_usuario_cadastro, status=StatusEquipamento.EM_USO, observacoes=None):
         self.patrimonio = patrimonio
         self.tipo = tipo
         self.marca = marca

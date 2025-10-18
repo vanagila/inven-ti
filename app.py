@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for
 from app.controllers.AuthController import auth_bp
 from app.controllers.EquipamentoController import equipamento_bp
+from app.controllers.RegistroSuporteController import registro_suporte_bp
 from app.database.connection import init_app
 from flask_migrate import Migrate
 
@@ -12,6 +13,7 @@ migrate = Migrate(app, db)
 
 app.register_blueprint(auth_bp)
 app.register_blueprint(equipamento_bp)
+app.register_blueprint(registro_suporte_bp)
 
 def ensure_admin():
     from app.models.Usuario import Usuario
