@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registros de Suporte</title>
+</head>
+<body>
+    <h1>Registros de Suporte</h1>
+
+    <!-- Filtros -->
+    <form method="GET" action="{{ url_for('registro_suporte.listar_registros') }}">
+        <div>
+            <label>Equipamento</label>
+            <select name="equipamento">
+                <option value="all">Todos</option>
+                {% for e in opcoes_filtros.equipamentos %}
+                <option value="{{ e.id }}" {{ 'selected' if filtros.equipamento and filtros.equipamento == (e.id|string) }}>{{ e.descricao }}</option>
+                {% endfor %}
+            </select>
+
+            <label>Tipo de Suporte</label>
+            <select name="tipo_suporte">
+                <option value="all">Todos</option>
+                {% for t in opcoes_filtros.tipo_suporte %}
+                <option value="{{ t }}" {{ 'selected' if filtros.tipo_suporte and filtros.tipo_suporte == (t|string) }}>{{ t }}</option>
+                {% endfor %}
+            </select>
+
+            <label>Responsável</label>
+            <select name="responsavel">
+                <option value="all">Todos</option>
+                {% for r in opcoes_filtros.responsavel %}
+                <option value="{{ r.id }}" {{ 'selected' if filtros.responsavel and filtros.responsavel == (r.id|string) }}>{{ r.nome }}</option>
+                {% endfor %}
+            </select>
+
+            <label>Pesquisa</label>
+            <input type="text" name="pesquisa" value="{{ filtros.pesquisa or '' }}" placeholder="Patrimônio, modelo...">
+
+            <button type="submit">Filtrar</button>
+            <a href="{{ url_for('registro_suporte.listar_registros') }}">Resetar</a>
+        </div>
+    </form>
+
+    <!-- Resultados -->
+    <p>Mostrando {{ pagination.total if pagination else 0 }} resultados</p>
+
+    <table border="1" cellpadding="6" cellspacing="0">
+        <thead>
+            <tr>
+                <th>Data</th>
+                <th>Equipamento</th>
+                <th>Tipo</th>
+                <th>Responsável</th>
+                <th>Descrição</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for registro in registros %}
+            <tr>
+                <td>{{ registro.data_suporte.strftime('%Y-%m-%d') if registro.data_suporte else '' }}</td>
+                <td>
+                    {% if registro.equipamento %}
+                        {{ registro.equipamento.patrimonio }} - {{ registro.equipamento.marca }} {{ registro.equipamento.modelo }}
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
+                <td>{{ registro.tipo_suporte }}</td>
+                <td>{{ registro.responsavel }}</td>
+                <td>{{ registro.descricao }}</td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="5">Nenhum registro encontrado.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Paginação simples -->
+    {% if pagination %}
+    <div>
+        {% if pagination.has_prev %}
+            <a href="{{ url_for('registro_suporte.listar_registros', page=pagination.prev_num, **filtros) }}">Anterior</a>
+        {% endif %}
+
+        {% for p in pagination.iter_pages() %}
+            {% if p %}
+                {% if p == pagination.page %}
+                    <strong>{{ p }}</strong>
+                {% else %}
+                    <a href="{{ url_for('registro_suporte.listar_registros', page=p, **filtros) }}">{{ p }}</a>
+                {% endif %}
+            {% else %}
+                ...
+            {% endif %}
+        {% endfor %}
+
+        {% if pagination.has_next %}
+            <a href="{{ url_for('registro_suporte.listar_registros', page=pagination.next_num, **filtros) }}">Próxima</a>
+        {% endif %}
+    </div>
+    {% endif %}
+
+</body>
+</html>

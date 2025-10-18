@@ -1,24 +1,22 @@
-from math import e
-from operator import contains, eq
-from os import error
-from time import strptime
 from flask import Blueprint, request, jsonify, render_template, redirect, url_for, session, flash
 from app.database.connection import db
 from app.models.Equipamento import Equipamento
 from datetime import datetime
-
+from app.models.enums import StatusEquipamento
+from app.models.enums import TipoSuporte
 equipamento_bp = Blueprint('equipamento', __name__, url_prefix='/equipamentos')
 
 @equipamento_bp.route('/', methods=['GET', 'POST'])
 def cadastrar_equipamento():
     if request.method == 'GET':
-        return render_template('equipamentos/cadastro.html')
+        return render_template('equipamentos/cadastro.html', status_options=StatusEquipamento.todos())
 
     try:
         if request.is_json:
             dados = request.get_json()
         else:
             dados = request.form.to_dict()
+            dados['status'] = dados.get('status') or StatusEquipamento.EM_USO
 
         user_id = session.get('user_id')
         if not user_id:
@@ -71,13 +69,13 @@ def listar_equipamentos():
 
         query = Equipamento.query
 
-        if tipo:
+        if tipo and tipo != 'all':
             query = query.filter(Equipamento.tipo.contains(tipo))
-        if status:
+        if status and status != 'all':
             query = query.filter(Equipamento.status == status)
-        if localizacao:
+        if localizacao and localizacao != 'all':
             query = query.filter(Equipamento.localizacao.contains(localizacao))
-        if marca:
+        if marca and marca != 'all':
             query = query.filter(Equipamento.marca.contains(marca))
 
         if pesquisa:
@@ -138,7 +136,7 @@ def consultar_equipamento(id):
         if request.is_json:
             return jsonify({'erro': str(e)}), 404
         else:
-            flash('Equipamento não encontrado.' 'danger')
+            flash('Equipamento não encontrado.', 'danger')
             return redirect(url_for('equipamento.listar_equipamentos'))
         
 @equipamento_bp.route('/<int:id>', methods=['PUT', 'POST'])
@@ -186,8 +184,9 @@ def atualizar_equipamento(id):
             return jsonify({'erro': str(e)}), 400
         else:
             flash('Erro ao atualizar equipamento.' 'danger')
-            return redirect(url_for('equipamento.consultar_equipamentos', id=id))
+            return redirect(url_for('equipamento.consultar_equipamento', id=id))
         
+@equipamento_bp.route('/<int:id>/desativar', methods=['POST', 'DELETE'])
 def desativar_equipamento(id):
     try:
         equipamento = Equipamento.query.get_or_404(id)
@@ -205,7 +204,7 @@ def desativar_equipamento(id):
                 return jsonify({'erro': 'Equipamento já está desativado'}), 400
             else:
                 flash('Equipamento já está desativado.' 'warning')
-            return redirect(url_for('equipamento.consultar_equipamentos', id=id))
+            return redirect(url_for('equipamento.consultar_equipamento', id=id))
         
         equipamento.status = 'Desativado'
         equipamento.atualizar_alteracao(user_id)
@@ -226,4 +225,4 @@ def desativar_equipamento(id):
             return jsonify({'erro': str(e)}), 400
         else:
             flash(f'Erro ao desativar equipamento: {str(e)}', 'danger')
-            return redirect(url_for('equipamento.consultar_equipamento', id=id))
+            return redirect(url_for('equipamento.consultar_equipamento', id=id)) 

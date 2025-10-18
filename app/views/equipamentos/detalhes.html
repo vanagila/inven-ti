@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalhes do Equipamento - {{ equipamento.patrimonio }}</title>
+</head>
+<body>
+    <header>
+        <h1>Detalhes do Equipamento</h1>
+        <nav>
+            <a href="{{ url_for('equipamento.listar_equipamentos') }}">← Voltar para Lista</a>
+        </nav>
+    </header>
+
+    <main>
+        <section>
+            <h2>Informações Básicas</h2>
+            <table border="1" cellpadding="8" cellspacing="0">
+                <tr>
+                    <th>Patrimônio:</th>
+                    <td>{{ equipamento.patrimonio }}</td>
+                </tr>
+                <tr>
+                    <th>Tipo:</th>
+                    <td>{{ equipamento.tipo }}</td>
+                </tr>
+                <tr>
+                    <th>Marca:</th>
+                    <td>{{ equipamento.marca }}</td>
+                </tr>
+                <tr>
+                    <th>Modelo:</th>
+                    <td>{{ equipamento.modelo }}</td>
+                </tr>
+                <tr>
+                    <th>Número de Série:</th>
+                    <td>{{ equipamento.numero_serie }}</td>
+                </tr>
+                <tr>
+                    <th>Localização:</th>
+                    <td>{{ equipamento.localizacao }}</td>
+                </tr>
+                <tr>
+                    <th>Status:</th>
+                    <td>{{ equipamento.status }}</td>
+                </tr>
+                <tr>
+                    <th>Data de Aquisição:</th>
+                    <td>{{ equipamento.data_aquisicao.strftime('%d/%m/%Y') if equipamento.data_aquisicao else 'N/A' }}</td>
+                </tr>
+            </table>
+        </section>
+
+        {% if equipamento.observacoes %}
+        <section>
+            <h2>Observações</h2>
+            <p>{{ equipamento.observacoes }}</p>
+        </section>
+        {% endif %}
+
+        <section>
+            <h2>Histórico de Manutenções</h2>
+            {% if equipamento.registros_suporte %}
+                <table border="1" cellpadding="8" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>Data</th>
+                            <th>Tipo</th>
+                            <th>Responsável</th>
+                            <th>Descrição</th>
+                            <th>Custo</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for registro in equipamento.registros_suporte %}
+                        <tr>
+                            <td>{{ registro.data_suporte.strftime('%d/%m/%Y') if registro.data_suporte else 'N/A' }}</td>
+                            <td>{{ registro.tipo_suporte }}</td>
+                            <td>{{ registro.responsavel }}</td>
+                            <td>{{ registro.descricao }}</td>
+                            <td>R$ {{ "%.2f"|format(registro.custo) if registro.custo else '0,00' }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p>Nenhum registro de manutenção encontrado.</p>
+            {% endif %}
+        </section>
+
+        <section>
+            <h2>Ações</h2>
+            <div>
+                <a href="{{ url_for('registro_suporte.registrar_suporte') }}?id_equipamento={{ equipamento.id }}">
+                    <button type="button">Registrar Nova Manutenção</button>
+                </a>
+                <a href="{{ url_for('equipamento.listar_equipamentos') }}">
+                    <button type="button">Voltar para Lista</button>
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>Sistema de Gestão de Equipamentos de TI</p>
+    </footer>
+</body>
+</html>
