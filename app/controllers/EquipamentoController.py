@@ -30,11 +30,11 @@ def cadastrar_equipamento():
 
         if Equipamento.query.filter_by(patrimonio=dados.get('patrimonio')).first():
             flash('Este número de patrimônio já está cadastrado.', 'danger')
-            return render_template('equipamentos/cadastro.html', dados=dados)
+            return redirect(url_for('equipamento.cadastrar_equipamento'))
 
         if Equipamento.query.filter_by(numero_serie=dados.get('numero_serie')).first():
             flash('Este número de série já está cadastrado.', 'danger')
-            return render_template('equipamentos/cadastro.html', dados=dados)
+            return redirect(url_for('equipamento.cadastrar_equipamento'))
 
         equipamento = Equipamento(**dados)
         db.session.add(equipamento)
@@ -52,7 +52,7 @@ def cadastrar_equipamento():
             return jsonify({'erro': str(e)}), 400
         else:
             flash(f'Erro ao cadastrar equipamento: {str(e)}', 'danger')
-            return render_template('equipamentos/cadastro.html', dados=request.form)
+            return redirect(url_for('equipamento.cadastrar_equipamento'))
         
 @equipamento_bp.route('/lista', methods=['GET'])
 def listar_equipamentos():
