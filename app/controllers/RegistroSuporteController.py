@@ -107,10 +107,9 @@ def listar_registros():
             )
         
         query = query.order_by(RegistroSuporte.data_suporte.desc())
-        
 
         pagination = query.paginate(page=page, per_page=per_page, error_out=False)
-        registros = pagination.item
+        registros = pagination.items
         
         if request.is_json:
             return jsonify({

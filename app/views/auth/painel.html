@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+{% block title %}Painel - invenTI{% endblock %}
+
+{% block header %}
+  {% include 'partials/_header.html' %}
+{% endblock %}
+
+{% block content %}
+    <div class="container py-4">
+        <h2 class="fw-semibold mb-1">Painel</h2>
+        <p class="text-muted mb-4">Visão geral do seu sistema de gerenciamento de equipamentos de TI</p>
+
+        <!-- Cards de métricas -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-3">
+                <div class="card p-3 metric-card">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5>Total de Equipamentos</h5>
+                            <p class="metric-value">{{ total_equipamentos | default(0) }}</p>
+                        </div>
+                        <i class="fa-solid fa-desktop fs-3 text-secondary"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card p-3 metric-card">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5>Em Uso</h5>
+                            <p class="metric-value">{{ equipamentos_em_uso | default(0) }}</p>
+                        </div>
+                        <i class="fa-regular fa-circle-check fs-3 text-secondary"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card p-3 metric-card">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5>Em Manutenção</h5>
+                            <p class="metric-value">{{ equipamentos_em_manutencao | default(0) }}</p>
+                        </div>
+                        <i class="fa-solid fa-wrench fs-3 text-secondary"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card p-3 metric-card">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5>Desativados</h5>
+                            <p class="metric-value">{{ equipamentos_desativados | default(0) }}</p>
+                        </div>
+                        <i class="fa-regular fa-circle-xmark fs-3 text-secondary"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ações rápidas -->
+        <h5 class="fw-semibold mb-3">Ações Rápidas</h5>
+        <div class="action-buttons mb-4 d-flex flex-wrap gap-2">
+            <a href="{{ url_for('equipamento.cadastrar_equipamento') }}" class="btn btn-dark fw-semibold"><i class="fa-solid fa-plus me-2"></i>Novo Equipamento</a>
+            <a href="{{ url_for('registro_suporte.registrar_suporte') }}" class="btn btn-dark fw-semibold"><i class="fa-solid fa-plus me-2"></i>Novo Suporte</a>
+        </div>
+
+        <!-- Tabela -->
+        <div class="card">
+            <div class="card-body">
+                <h5 class="fw-semibold mb-3 table-title">Equipamentos Recentes</h5>
+                <!-- Desktop -->
+                <div class="table-responsive d-none d-md-block">
+                    <table class="table align-middle">
+                        <thead>
+                            <tr>
+                                <th>Patrimonio</th>
+                                <th>Tipo</th>
+                                <th>Marca</th>
+                                <th>Modelo</th>
+                                <th>Local</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for equipamento in equipamentos_recentes %}
+                            <tr>
+                                <td>{{ equipamento.patrimonio }}</td>
+                                <td>{{ equipamento.tipo }}</td>
+                                <td>{{ equipamento.marca }}</td>
+                                <td>{{ equipamento.modelo }}</td>
+                                <td>{{ equipamento.localizacao }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Mobile Cards -->
+                <div class="d-block d-md-none mt-4">
+                    <div class="panel-card">
+                        {% for equipamento in equipamentos_recentes %}
+                        <div class="top-row">
+                            <div class="equip-name">
+                                <strong>Patrimônio:</strong>
+                                {{ equipamento.patrimonio }}
+                            </div>
+                        </div>
+                        <div class="desc">
+                            <strong>Tipo:</strong>
+                            {{ equipamento.tipo }}
+                        </div>
+                        <div class="row g-2">
+                            <div class="col-6 meta"><strong>Marca:</strong> {{ equipamento.marca }}</div>
+                            <div class="col-6 meta"><strong>Modelo:</strong> {{ equipamento.modelo }}</div>
+                        </div>
+                        <div class="meta mt-2"><strong>Localização:</strong> {{ equipamento.localizacao }}</div>
+                        {% endfor %}
+                    </div>
+                </div>
+                <a href="{{ url_for('equipamento.listar_equipamentos') }}" class="footer-link mt-2 d-block">Visualizar todos →</a>
+            </div>
+        </div>
+    </div>
+{% endblock %}
