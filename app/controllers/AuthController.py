@@ -1,7 +1,9 @@
 from flask import Blueprint, request, jsonify, render_template, redirect, url_for, session, flash
 from app.database.connection import db
+from app.models import Equipamento
 from app.models.Usuario import Usuario
 import re
+from app.models.enums import StatusEquipamento
 
 auth_bp = Blueprint('auth', __name__, url_prefix='/auth')
 
@@ -97,8 +99,8 @@ def login():
                     'usuario': usuario.to_dict()
                 })
             else:
-                flash(f'Bem vindo(a), {usuario.nome}!', 'success')
-                return redirect(url_for('auth.login'))
+                # flash(f'Bem vindo(a), {usuario.nome}!', 'success')
+                return redirect(url_for('auth.painel'))
         else:
             mensagem = 'Email ou senha incorretos.'
             if request.is_json:
@@ -107,3 +109,51 @@ def login():
                 flash(mensagem, 'danger')
 
     return render_template('auth/login.html')
+
+@auth_bp.route('/logout')
+def logout():
+    if 'user_id' in session:
+        session.pop('user_id', None)
+        session.pop('user_nome', None)
+        session.pop('user_email', None)
+        session.pop('is_admin', None)
+
+        session.clear()
+
+        flash('Você saiu da sua conta com sucesso.', 'info')
+    
+    return redirect(url_for('auth.login'))
+
+@auth_bp.route('/painel', methods=['GET'])
+def painel():
+    try:
+        total_equipamentos = Equipamento.query.count()
+        equipamentos_em_uso = Equipamento.query.filter_by(status=StatusEquipamento.EM_USO).count()
+        equipamentos_desativados = Equipamento.query.filter_by(status=StatusEquipamento.DESATIVADO).count()
+        equipamentos_em_manutencao = Equipamento.query.filter_by(status=StatusEquipamento.EM_MANUTENCAO).count()
+        equipamentos_recentes = Equipamento.query.order_by(Equipamento.data_cadastro.desc()).limit(5).all()
+
+        if request.is_json:
+            return jsonify({
+                'total_equipamentos': total_equipamentos,
+                'equipamentos_desativados': equipamentos_desativados,
+                'equipamentos_em_uso': equipamentos_em_uso,
+                'equipamentos_em_manutencao': equipamentos_em_manutencao,
+                'equipamentos_recentes': equipamentos_recentes
+            }), 200
+        
+        return render_template('auth/painel.html', total_equipamentos=total_equipamentos, equipamentos_desativados=equipamentos_desativados, equipamentos_em_manutencao=equipamentos_em_manutencao, equipamentos_em_uso=equipamentos_em_uso,
+        equipamentos_recentes=equipamentos_recentes)
+    
+    except Exception as e:
+        if request.is_json:
+            return jsonify({'erro': str(e)}), 500
+        else:
+            flash(f'Erro ao carregar painel: {str(e)}', 'danger')
+            return render_template('auth/painel.html',
+                total_equipamentos=0,
+                equipamentos_em_uso=0,
+                equipamentos_em_manutencao=0,
+                equipamentos_desativados=0,
+                equipamentos_recentes=[]
+            )

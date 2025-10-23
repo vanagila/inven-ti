@@ -1,0 +1,138 @@
+:root {
+    --bg-color: #f8f9fb;
+    --card-bg: #ffffff;
+    --border-color: #e5e7eb;
+    --text-muted: #6b7280;
+    --text-default: #111827;
+    --radius: 12px;
+    --input-radius: 8px;
+}
+
+/* Toggle senha (login) */
+.toggle-password {
+    cursor: pointer;
+    user-select: none;
+    color: var(--text-muted);
+}
+
+/* Badges suaves */
+.badge-soft {
+    display: inline-flex;
+    align-items: center;
+    gap: .35rem;
+    border: 1px solid;
+    padding: .25rem .55rem;
+    border-radius: 999px;
+    font-weight: 600;
+    font-size: .75rem;
+}
+
+.badge-soft.success {
+    background: #e8f7ef;
+    border-color: #b5e4c2;
+    color: #166534;
+}
+
+.badge-soft.neutral {
+    background: #eef2f7;
+    border-color: #d6dee9;
+    color: #374151;
+}
+
+/* Informações (detalhes do equipamento) */
+.info-label {
+    color: var(--text-muted);
+    font-size: .85rem;
+    margin-bottom: .15rem;
+}
+
+.info-value {
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+/* Ações na tabela */
+.table-actions .btn {
+    --bs-btn-padding-y: .25rem;
+    --bs-btn-padding-x: .45rem;
+}
+.table-actions .btn i {
+    font-size: 1rem;
+}
+
+.navbar {
+    background-color: #fff;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.navbar-brand i {
+    font-size: 1.25rem;
+    margin-right: .4rem;
+}
+
+.table {
+    vertical-align: middle;
+}
+
+.table th {
+    color: var(--text-muted);
+    font-weight: 600;
+}
+
+.table td {
+    color: #374151;
+    font-size: 0.95rem;
+}
+
+.metric-value {
+    font-size: 1.8rem;
+    font-weight: 600;
+    margin-bottom: 0;
+}
+
+.metric-card {
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+}
+
+.metric-card h5, .table-title {
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #555;
+}
+
+/* ====== Mobile cards (painel) ====== */
+@media (max-width: 767.98px) {
+    .panel-card {
+        background: #fff;
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius);
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+    .panel-card .top-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: .35rem;
+    }
+    .panel-card .equip-name {
+        font-weight: 600;
+        font-size: .95rem;
+        display: flex;
+        align-items: center;
+        gap: .35rem;
+    }
+    .panel-card .desc {
+        font-size: .9rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        margin-bottom: .25rem;
+    }
+    .panel-card .meta {
+        font-size: .8rem;
+        color:  var(--text-muted);
+    }
+}

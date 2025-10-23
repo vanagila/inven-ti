@@ -1,10 +1,10 @@
-body {
-    background-color: #f5f5f5;
+/* body {
+    background-color: #f8f9fb;
     font-family: 'Inter', sans-serif;
     color: #212529;
     min-height: 100vh;
     display: flex;
-    flex-direction: column; /* stack header above content */
+    flex-direction: column;
 }
 
 .auth-box {
@@ -34,6 +34,15 @@ body {
     cursor: pointer;
 }
 
+.link-header {
+    color: #4b5563;
+}
+
+.link-header:hover {
+    color: #111827;
+    background-color: none;
+}
+
 label {
     color: #374151
 }
@@ -53,4 +62,95 @@ h1 {
 a:hover {
     background-color: #fafafa !important;
     color: #374151 !important;
+}
+
+a {
+    text-decoration: none;
+} */
+
+/* ===========================
+   THEME GLOBAL - invenTI
+   =========================== */
+
+:root {
+    --bg-color: #f8f9fb;
+    --card-bg: #ffffff;
+    --border-color: #e5e7eb;
+    --text-muted: #6b7280;
+    --text-default: #111827;
+    --radius: 12px;
+    --input-radius: 8px;
+}
+
+/* Body padrão */
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-default);
+    margin: 0;
+}
+
+/* Navbar */
+.navbar {
+    background-color: var(--card-bg);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.nav-link.active,
+.link-header.active {
+    position: relative;
+}
+.nav-link.active::after,
+.link-header.active::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--text-default);
+    bottom: -6px;
+    border-radius: 2px;
+}
+
+/* Cards globais */
+.card,
+.form-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+}
+
+/* Inputs */
+.form-control {
+    border: 1px solid var(--border-color);
+    border-radius: var(--input-radius);
+    padding: .65rem .9rem;
+    font-size: .95rem;
+}
+
+.form-control:focus {
+    box-shadow: none;
+    border-color: #bfc7d5;
+}
+
+/* Botões */
+.btn-dark {
+    border-radius: var(--input-radius);
+}
+
+.btn-outline-secondary {
+    border-radius: var(--input-radius);
+}
+
+/* Títulos de seção */
+.section-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+/* Links padrão */
+a {
+    text-decoration: none;
+    color: inherit;
 }
