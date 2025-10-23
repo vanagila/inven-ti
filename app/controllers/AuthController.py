@@ -29,22 +29,22 @@ def cadastrar_usuario():
 
             if not nome or not email or not senha:
                 flash('Nome, email e senha são obrigatórios.', 'danger')
-                return render_template('auth/cadastrar.html', dados=request.form)
+                return redirect(url_for('auth.cadastrar_usuario'))
 
             # validacao email
             email_re = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
             if not email_re.match(email):
                 flash('Email inválido.', 'danger')
-                return render_template('auth/cadastrar.html', dados=request.form)
+                return redirect(url_for('auth.cadastrar_usuario'))
 
             # 6 caracteres, pelo menos um digito e uma letra
             if len(senha) < 6 or not re.search(r"[0-9]", senha) or not re.search(r"[A-Za-z]", senha):
                 flash('Senha fraca. Use pelo menos 6 caracteres, com letras e números.', 'danger')
-                return render_template('auth/cadastrar.html', dados=request.form)
+                return redirect(url_for('auth.cadastrar_usuario'))
 
             if Usuario.query.filter_by(email=email).first():
                 flash('Este email já está cadastrado', 'danger')
-                return render_template('auth/cadastrar.html', dados=request.form)
+                return redirect(url_for('auth.cadastrar_usuario'))
 
             dados = {
                 'nome': nome,
@@ -71,6 +71,7 @@ def cadastrar_usuario():
         except Exception as e:
             db.session.rollback()
             flash(f'Erro ao cadastrar usuário: {str(e)}', 'danger')
+            return redirect(url_for('auth.cadastrar_usuario'))
     
     return render_template('auth/cadastrar.html')
 
@@ -107,6 +108,7 @@ def login():
                 return jsonify({'erro': mensagem}), 401
             else:
                 flash(mensagem, 'danger')
+                return redirect(url_for('auth.login'))
 
     return render_template('auth/login.html')
 

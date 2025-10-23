@@ -1,43 +1,44 @@
-
-{% extends 'base.html' %}
-{%block title %}InvenTI - Login{% endblock %}
+{% extends "base.html" %}
+{% block title %} Painel - invenTI {% endblock %}
 
 {% block content %}
-<div class="auth-page">
-  <div class="auth-box">
-  {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-      <div class="mb-3">
-        {% for category, message in messages %}
-          <div class="alert {% if category == 'success' %}alert-success{% else %}alert-danger{% endif %}" role="alert">
-            {{ message }}
-          </div>
-        {% endfor %}
-      </div>
-    {% endif %}
-  {% endwith %}
-    
-  <div class="text-center mb-8">
-    <div class="flex items-center justify-center">
-      <i class="fa-solid fa-desktop text-3xl text-neutral-800 fs-4"></i>
+	<div class="auth-page">
+        <div class="login-card">
+			{% with messages = get_flashed_messages(with_categories=true) %}
+				{% if messages %}
+				<div class="mb-3">
+					{% for category, message in messages %}
+					<div class="alert {% if category == 'success' %}alert-success{% else %}alert-danger{% endif %} text-center" role="alert">
+						{{ message }}
+					</div>
+					{% endfor %}
+				</div>
+				{% endif %}
+			{% endwith %}
+            <div class="text-center mb-3">
+                <i class="fa-solid fa-desktop text-3xl text-neutral-800 fs-1"></i>
+                <div class="login-title">Login • invenTI</div>
+                <p class="text-sm text-neutral-600">Gerencie seus ativos de TI com eficiência</p>
+            </div>
+
+            <form method="POST" action="{{ url_for('auth.login') }}">
+                <div class="mb-3">
+                    <label class="form-label">E-mail</label>
+                    <input type="email" class="form-control" name="email" placeholder="Digite seu e-mail" required>
+                </div>
+
+                <div class="mb-3">
+					<label class="form-label">Senha</label>
+					<div class="input-group">
+						<input type="password" class="form-control" name="senha" id="senha" placeholder="Digite sua senha" required>
+						<span class="input-group-text bg-white border-start-0 toggle-password" onclick="togglePassword()">
+							<i class="fa-solid fa-eye" id="toggleIcon"></i>
+						</span>
+					</div>
+                </div>
+
+                <button type="submit" class="btn btn-dark w-100 mt-2">Entrar</button>
+            </form>
+        </div>
     </div>
-    <h1 class="text-2xl text-neutral-900 mb-2">InvenTI</h1>
-    <p class="text-sm text-neutral-600">Gerencie seus ativos de TI com eficiência</p>
-  </div>
-    
-  <form method="POST" action="{{ url_for('auth.login') }}">
-    <div class="mb-3">
-      <label for="email" class="form-label">Email</label>
-      <input type="text" name="email" id="email" class="form-control" placeholder="Digite seu email" required>
-    </div>
-      
-    <div class="mb-3">
-      <label for="senha" class="form-label">Senha</label>
-      <input type="password" name="senha" id="senha" class="form-control" placeholder="Digite sua senha" required>
-    </div>
-      
-    <button type="submit" class="btn btn-dark w-100">Login</button>
-  </form>
-  </div>
-</div>
 {% endblock %}

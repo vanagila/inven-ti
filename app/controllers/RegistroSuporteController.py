@@ -50,15 +50,7 @@ def registrar_suporte():
             return jsonify({'erro': str(e)}), 400
         else:
             flash(f'Erro ao cadastrar registro: {str(e)}', 'danger')
-            equipamentos = Equipamento.query.all()
-            responsaveis = Usuario.query.all()
-            equipamento_selecionado = Equipamento.query.get(equipamento_id)
-                
-            return render_template('suporte/cadastro.html', 
-                     dados=dados,
-                     equipamentos=equipamentos,
-                     responsaveis=responsaveis,
-                     equipamento_selecionado=equipamento_selecionado)
+            return redirect(url_for('registro_suporte.registrar_suporte', id_equipamento=dados.get('id_equipamento')))
         
 @registro_suporte_bp.route('/lista', methods=['GET'])
 def listar_registros():
