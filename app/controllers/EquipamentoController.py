@@ -139,7 +139,7 @@ def consultar_equipamento(id):
             flash('Equipamento não encontrado.', 'danger')
             return redirect(url_for('equipamento.listar_equipamentos'))
         
-@equipamento_bp.route('/<int:id>', methods=['PUT', 'POST'])
+@equipamento_bp.route('/<int:id>/atualizar', methods=['PUT', 'POST'])
 def atualizar_equipamento(id):
     try:
         equipamento = Equipamento.query.get_or_404(id)

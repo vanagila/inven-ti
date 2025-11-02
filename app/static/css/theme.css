@@ -102,6 +102,7 @@ body {
 .link-header.active {
     position: relative;
 }
+
 .nav-link.active::after,
 .link-header.active::after {
     content: '';
@@ -143,12 +144,6 @@ body {
 
 .btn-outline-secondary {
     border-radius: var(--input-radius);
-}
-
-/* Títulos de seção */
-.section-title {
-    font-size: 1.25rem;
-    font-weight: 600;
 }
 
 /* Links padrão */

@@ -1,109 +1,166 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Detalhes do Equipamento - {{ equipamento.patrimonio }}</title>
-</head>
-<body>
-    <header>
-        <h1>Detalhes do Equipamento</h1>
-        <nav>
-            <a href="{{ url_for('equipamento.listar_equipamentos') }}">← Voltar para Lista</a>
+{% extends "base.html" %}
+{% block title %}Detalhes do Equipamento{% endblock %}
+
+{% block header %}
+  {% include 'partials/_header.html' %}
+{% endblock %}
+
+{% block content %}
+    <div class="container py-4">
+        <!-- Breadcrumb -->
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-1">
+                <li class="breadcrumb-item"><a href="{{ url_for('equipamento.listar_equipamentos') }}">Equipamentos</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Detalhes do Equipamento</li>
+            </ol>
         </nav>
-    </header>
 
-    <main>
-        <section>
-            <h2>Informações Básicas</h2>
-            <table border="1" cellpadding="8" cellspacing="0">
-                <tr>
-                    <th>Patrimônio:</th>
-                    <td>{{ equipamento.patrimonio }}</td>
-                </tr>
-                <tr>
-                    <th>Tipo:</th>
-                    <td>{{ equipamento.tipo }}</td>
-                </tr>
-                <tr>
-                    <th>Marca:</th>
-                    <td>{{ equipamento.marca }}</td>
-                </tr>
-                <tr>
-                    <th>Modelo:</th>
-                    <td>{{ equipamento.modelo }}</td>
-                </tr>
-                <tr>
-                    <th>Número de Série:</th>
-                    <td>{{ equipamento.numero_serie }}</td>
-                </tr>
-                <tr>
-                    <th>Localização:</th>
-                    <td>{{ equipamento.localizacao }}</td>
-                </tr>
-                <tr>
-                    <th>Status:</th>
-                    <td>{{ equipamento.status }}</td>
-                </tr>
-                <tr>
-                    <th>Data de Aquisição:</th>
-                    <td>{{ equipamento.data_aquisicao.strftime('%d/%m/%Y') if equipamento.data_aquisicao else 'N/A' }}</td>
-                </tr>
-            </table>
-        </section>
+        <!-- Título e subtítulo -->
+        <h2 class="fw-semibold mb-1">Detalhes do Equipamento</h2>
+        <p class="text-muted mb-4">Informações detalhadas e histórico de suporte para {{ equipamento.patrimonio }}</p>
 
-        {% if equipamento.observacoes %}
-        <section>
-            <h2>Observações</h2>
-            <p>{{ equipamento.observacoes }}</p>
-        </section>
-        {% endif %}
+        <!-- Bloco de informações -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h6 class="section-title mb-0">Informações do Equipamento</h6>
+                    <button type="button" class="btn btn-dark fw-semibold" data-bs-toggle="modal" data-bs-target="#modalEditar" 
+                            data-id="{{ equipamento.id }}"
+                            data-patrimonio="{{ equipamento.patrimonio }}"
+                            data-tipo="{{ equipamento.tipo }}"
+                            data-marca="{{ equipamento.marca }}"
+                            data-modelo="{{ equipamento.modelo }}"
+                            data-numero_serie="{{ equipamento.numero_serie }}"
+                            data-localizacao="{{ equipamento.localizacao }}"
+                            data-data_aquisicao="{{ equipamento.data_aquisicao.strftime('%Y-%m-%d') if equipamento.data_aquisicao else '' }}"
+                            data-status="{{ equipamento.status }}"
+                            data-observacoes="{{ equipamento.observacoes or '' }}"
+                            data-update-url="{{ url_for('equipamento.atualizar_equipamento', id=equipamento.id) }}">
+                        <i class="fa-solid fa-pencil me-1"></i> Editar Equipamento
+                    </button>
+                </div>
 
-        <section>
-            <h2>Histórico de Manutenções</h2>
-            {% if equipamento.registros_suporte %}
-                <table border="1" cellpadding="8" cellspacing="0">
-                    <thead>
-                        <tr>
-                            <th>Data</th>
-                            <th>Tipo</th>
-                            <th>Responsável</th>
-                            <th>Descrição</th>
-                            <th>Custo</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for registro in equipamento.registros_suporte %}
-                        <tr>
-                            <td>{{ registro.data_suporte.strftime('%d/%m/%Y') if registro.data_suporte else 'N/A' }}</td>
-                            <td>{{ registro.tipo_suporte }}</td>
-                            <td>{{ registro.responsavel }}</td>
-                            <td>{{ registro.descricao }}</td>
-                            <td>R$ {{ "%.2f"|format(registro.custo) if registro.custo else '0,00' }}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            {% else %}
-                <p>Nenhum registro de manutenção encontrado.</p>
-            {% endif %}
-        </section>
+                <div class="row g-4">
+                    <div class="col-12 col-md-4">
+                        <div class="info-label">Patrimônio</div>
+                        <div class="info-value">{{ equipamento.patrimonio }}</div>
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <div class="info-label">Tipo</div>
+                        <div class="info-value">{{ equipamento.tipo }}</div>
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <div class="info-label">Marca</div>
+                        <div class="info-value">{{ equipamento.marca }}</div>
+                    </div>
 
-        <section>
-            <h2>Ações</h2>
-            <div>
-                <a href="{{ url_for('registro_suporte.registrar_suporte') }}?id_equipamento={{ equipamento.id }}">
-                    <button type="button">Registrar Nova Manutenção</button>
-                </a>
-                <a href="{{ url_for('equipamento.listar_equipamentos') }}">
-                    <button type="button">Voltar para Lista</button>
-                </a>
+                    <div class="col-12 col-md-4">
+                        <div class="info-label">Modelo</div>
+                        <div class="info-value">{{ equipamento.modelo }}</div>
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <div class="info-label">Nº de Série</div>
+                        <div class="info-value">{{ equipamento.numero_serie }}</div>
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <div class="info-label">Data de Compra</div>
+                        <div class="info-value">{{ equipamento.data_aquisicao.strftime('%d/%m/%Y') }}</div>
+                    </div>
+
+                    <div class="col-12 col-md-4">
+                        <div class="info-label">Local</div>
+                        <div class="info-value">{{ equipamento.localizacao }}</div>
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <div class="info-label">Status</div>
+                        <div class="info-value">
+                            {% if equipamento.status == 'Ativo' %}
+                            <span class="badge-soft success"><i class="fa-solid fa-circle-check"></i> Ativo</span>
+                            {% else %}
+                            <span class="badge-soft neutral">{{ equipamento.status }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
             </div>
-        </section>
-    </main>
+        </div>
 
-    <footer>
-        <p>Sistema de Gestão de Equipamentos de TI</p>
-    </footer>
-</body>
-</html>
+        <!-- Histórico de Suporte -->
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h6 class="section-title mb-0">Histórico de Suporte</h6>
+                    <a class="btn btn-dark fw-semibold" data-bs-toggle="modal" data-bs-target="#modalHistorico">
+                        <i class="fa-solid fa-plus me-1"></i>Novo Suporte
+                    </a>
+                </div>
+
+                <!-- Desktop -->
+                <div class="table-responsive d-none d-md-block">
+                    <table class="table align-middle">
+                        <thead>
+                            <tr>
+                                <th>Data</th>
+                                <th>Tipo de Suporte</th>
+                                <th>Técnico</th>
+                                <th>Custo</th>
+                                <th class="text-center" style="width: 120px;">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for historico in historicos %}
+                            <tr>
+                                <td>{{ historico.data.strftime('%d-%m-%Y') }}</td>
+                                <td><span class="badge-soft neutral">{{ historico.tipo }}</span></td>
+                                <td>{{ historico.tecnico }}</td>
+                                <td>R${{ "%.2f"|format(historico.custo) }}</td>
+                                <td class="text-center table-actions">
+                                    <button class="btn btn-outline-secondary btn-sm" title="Ver"><i class="fa-solid fa-eye"></i></button>
+                                    <button class="btn btn-outline-secondary btn-sm" title="Editar"><i class="fa-solid fa-pen"></i></button>
+                                    <button class="btn btn-outline-secondary btn-sm" title="Excluir"><i class="fa-solid fa-trash"></i></button>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="5" class="text-center text-muted py-3">Nenhum histórico de suporte encontrado.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Mobile (cards) -->
+                <div class="d-block d-md-none">
+                    {% for historico in historicos %}
+                    <div class="panel-card">
+                        <div class="top-row">
+                            <div class="equip-name">
+                                <i class="fa-solid fa-screwdriver-wrench"></i> {{ historico.tipo }}
+                            </div>
+                            <div class="meta">{{ historico.data.strftime('%d/%m/%Y') }}</div>
+                        </div>
+                        <div class="desc">
+                            <strong>Técnico:</strong> {{ historico.tecnico }}
+                        </div>
+                        <div class="desc">
+                            <strong>Custo:</strong> R${{ "%.2f"|format(historico.custo) }}
+                        </div>
+                        <div class="d-flex gap-2 mt-2">
+                            <button class="btn btn-outline-secondary btn-sm"><i class="fa-solid fa-eye"></i></button>
+                            <button class="btn btn-outline-secondary btn-sm"><i class="fa-solid fa-pen"></i></button>
+                            <button class="btn btn-outline-secondary btn-sm"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                    </div>
+                    {% else %}
+                    <p class="text-muted text-center">Nenhum histórico de suporte encontrado.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# Modal de edição #}
+    {% set modal_id = 'modalEditar' %}
+    {% set modal_title = 'Editar Equipamento' %}
+    {% include 'partials/_modal-cadastro-equipamento.html' with context %}
+{% endblock %}
