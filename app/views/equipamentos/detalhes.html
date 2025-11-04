@@ -100,29 +100,36 @@
                     <table class="table align-middle">
                         <thead>
                             <tr>
-                                <th>Data</th>
+                                <th>Equipamento</th>
                                 <th>Tipo de Suporte</th>
-                                <th>Técnico</th>
+                                <th>Responsável</th>
+                                <th>Data</th>
                                 <th>Custo</th>
                                 <th class="text-center" style="width: 120px;">Ações</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {% for historico in historicos %}
+                            {% for registro in registros %}
                             <tr>
-                                <td>{{ historico.data.strftime('%d-%m-%Y') }}</td>
-                                <td><span class="badge-soft neutral">{{ historico.tipo }}</span></td>
-                                <td>{{ historico.tecnico }}</td>
-                                <td>R${{ "%.2f"|format(historico.custo) }}</td>
+                                <td>
+                                    {% if registro.equipamento %}
+                                        {{ registro.equipamento.patrimonio }} - {{ registro.equipamento.marca }} {{ registro.equipamento.modelo }}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                                <td>{{ registro.tipo_suporte }}</td>
+                                <td>{{ registro.responsavel }}</td>
+                                <td>{{ registro.data_suporte.strftime('%d-%m-%Y') if registro.data_suporte else '' }}</td>
+                                <td>R${{ "%.2f"|format(registro.custo) }}</td>
                                 <td class="text-center table-actions">
                                     <button class="btn btn-outline-secondary btn-sm" title="Ver"><i class="fa-solid fa-eye"></i></button>
-                                    <button class="btn btn-outline-secondary btn-sm" title="Editar"><i class="fa-solid fa-pen"></i></button>
-                                    <button class="btn btn-outline-secondary btn-sm" title="Excluir"><i class="fa-solid fa-trash"></i></button>
+                                    <button class="btn btn-outline-secondary btn-sm" title="Editar"><i class="fa-solid fa-pencil"></i></button>
                                 </td>
                             </tr>
                             {% else %}
                             <tr>
-                                <td colspan="5" class="text-center text-muted py-3">Nenhum histórico de suporte encontrado.</td>
+                                <td colspan="5" class="text-center text-muted py-3">Nenhum registro encontrado.</td>
                             </tr>
                             {% endfor %}
                         </tbody>
@@ -131,35 +138,44 @@
 
                 <!-- Mobile (cards) -->
                 <div class="d-block d-md-none">
-                    {% for historico in historicos %}
+                    {% for registro in registros %}
                     <div class="panel-card">
+                        <div>
+                            <strong>
+                                {% if registro.equipamento %}
+                                {{ registro.equipamento.patrimonio }} - {{ registro.equipamento.marca }} {{ registro.equipamento.modelo }}
+                                {% else %}
+                                -
+                                {% endif %}
+                            </strong>
+                        </div>
                         <div class="top-row">
                             <div class="equip-name">
-                                <i class="fa-solid fa-screwdriver-wrench"></i> {{ historico.tipo }}
+                                <i class="fa-solid fa-screwdriver-wrench"></i> {{ registro.tipo_suporte }}
                             </div>
-                            <div class="meta">{{ historico.data.strftime('%d/%m/%Y') }}</div>
+                            <div class="meta">{{ registro.data_suporte.strftime('%d-%m-%Y') if registro.data_suporte else '' }}
+                            </div>
                         </div>
                         <div class="desc">
-                            <strong>Técnico:</strong> {{ historico.tecnico }}
+                            <strong>Responsável:</strong> {{ registro.responsavel }}
                         </div>
                         <div class="desc">
-                            <strong>Custo:</strong> R${{ "%.2f"|format(historico.custo) }}
+                            <strong>Custo:</strong> R${{ "%.2f"|format(registro.custo) }}
                         </div>
                         <div class="d-flex gap-2 mt-2">
                             <button class="btn btn-outline-secondary btn-sm"><i class="fa-solid fa-eye"></i></button>
                             <button class="btn btn-outline-secondary btn-sm"><i class="fa-solid fa-pen"></i></button>
-                            <button class="btn btn-outline-secondary btn-sm"><i class="fa-solid fa-trash"></i></button>
                         </div>
                     </div>
                     {% else %}
-                    <p class="text-muted text-center">Nenhum histórico de suporte encontrado.</p>
+                    <p class="text-muted text-center">Nenhum registro encontrado.</p>
                     {% endfor %}
                 </div>
             </div>
         </div>
     </div>
-
-    {# Modal de edição #}
+    
+    {# Modal de edição (único, será preenchido via JS) #}
     {% set modal_id = 'modalEditar' %}
     {% set modal_title = 'Editar Equipamento' %}
     {% include 'partials/_modal-cadastro-equipamento.html' with context %}

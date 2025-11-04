@@ -1,0 +1,78 @@
+<div class="modal fade" id="{{ modal_id or 'modalNovoSuporte' }}" tabindex="-1" aria-labelledby="{{ (modal_id or 'modalNovoSuporte') + 'Label' }}" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title fw-semibold" id="{{ (modal_id or 'modalNovoSuporte') + 'Label' }}">Registrar Suporte</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+
+            <form id="{{ (modal_id or 'modalNovoSuporte') + '-form' }}" method="POST" action="{{ action_url or url_for('registro_suporte.registrar_suporte') }}">
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label" for="patrimonio">Patrimônio*</label>
+                            <input type="text" class="form-control" id="patrimonio" name="patrimonio" placeholder="Ex: DL001" required value="{{ equipamento.patrimonio if equipamento else '' }}">
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label" for="tipo">Tipo*</label>
+                            <select class="form-select" id="tipo" name="tipo" required>
+                                <option value="" disabled {{ 'selected' if not equipamento or not equipamento.tipo }} >Selecione...</option>
+                                <option value="Notebook" {{ 'selected' if equipamento and equipamento.tipo == 'Notebook' }}>Notebook</option>
+                                <option value="Desktop" {{ 'selected' if equipamento and equipamento.tipo == 'Desktop' }}>Desktop</option>
+                                <option value="Impressora" {{ 'selected' if equipamento and equipamento.tipo == 'Impressora' }}>Impressora</option>
+                                <option value="Servidor" {{ 'selected' if equipamento and equipamento.tipo == 'Servidor' }}>Servidor</option>
+                                <option value="Monitor" {{ 'selected' if equipamento and equipamento.tipo == 'Monitor' }}>Monitor</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label" for="marca">Marca*</label>
+                            <input type="text" class="form-control" placeholder="Ex: Dell" id="marca" name="marca" required value="{{ equipamento.marca if equipamento else '' }}">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label" for="modelo">Modelo*</label>
+                            <input type="text" class="form-control" placeholder="Ex: Latitude 5520" id="modelo" name="modelo" required value="{{ equipamento.modelo if equipamento else '' }}">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label" for="numero_serie">Nº de Série*</label>
+                            <input type="text" class="form-control" placeholder="Ex: SN-ABC12345" id="numero_serie" name="numero_serie" value="{{ equipamento.numero_serie if equipamento else '' }}">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label" for="localizacao">Local*</label>
+                            <input type="text" class="form-control" placeholder="Ex: 2 Andar" name="localizacao" id="localizacao" value="{{ equipamento.localizacao if equipamento else '' }}">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="data_aquisicao" class="form-label">Data de Aquisição</label>
+                            <input type="date" class="form-control" id="data_aquisicao" name="data_aquisicao" value="{{ equipamento.data_aquisicao.strftime('%Y-%m-%d') if equipamento and equipamento.data_aquisicao else '' }}">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label" for="status">Status*</label>
+                            <select class="form-select" id="status" name="status" required>
+                                <option value="" disabled {{ 'selected' if not equipamento or not equipamento.status }}>Selecione...</option>
+                                <option value="Em Uso" {{ 'selected' if equipamento and equipamento.status == 'Em Uso' }}>Em Uso</option>
+                                <option value="Em Manutenção" {{ 'selected' if equipamento and equipamento.status == 'Em Manutenção' }}>Manutenção</option>
+                                <option value="Desativado" {{ 'selected' if equipamento and equipamento.status == 'Desativado' }}>Desativado</option>
+                            </select>
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label" for="observacoes">Observações</label>
+                            <textarea class="form-control" id="observacoes" name="observacoes" rows="3" placeholder="Detalhes adicionais...">{{ equipamento.observacoes if equipamento else '' }}</textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-dark">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
