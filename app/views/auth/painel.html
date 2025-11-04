@@ -59,66 +59,72 @@
         </div>
 
         <!-- Ações rápidas -->
-        <h5 class="fw-semibold mb-3">Ações Rápidas</h5>
         <div class="action-buttons mb-4 d-flex flex-wrap gap-2">
-            <a href="{{ url_for('equipamento.cadastrar_equipamento') }}" class="btn btn-dark fw-semibold"><i class="fa-solid fa-plus me-2"></i>Novo Equipamento</a>
-            <a href="{{ url_for('registro_suporte.registrar_suporte') }}" class="btn btn-dark fw-semibold"><i class="fa-solid fa-plus me-2"></i>Novo Suporte</a>
+            <a href="{{ url_for('equipamento.cadastrar_equipamento') }}" class="btn btn-dark fw-semibold btn-full" data-bs-toggle="modal" data-bs-target="#modalNovoEquipamento">
+                <i class="fa-solid fa-plus me-2"></i>Novo Equipamento
+            </a>
         </div>
 
-        <!-- Tabela -->
-        <div class="card">
-            <div class="card-body">
-                <h5 class="fw-semibold mb-3 table-title">Equipamentos Recentes</h5>
-                <!-- Desktop -->
-                <div class="table-responsive d-none d-md-block">
-                    <table class="table align-middle">
-                        <thead>
-                            <tr>
-                                <th>Patrimonio</th>
-                                <th>Tipo</th>
-                                <th>Marca</th>
-                                <th>Modelo</th>
-                                <th>Local</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for equipamento in equipamentos_recentes %}
-                            <tr>
-                                <td>{{ equipamento.patrimonio }}</td>
-                                <td>{{ equipamento.tipo }}</td>
-                                <td>{{ equipamento.marca }}</td>
-                                <td>{{ equipamento.modelo }}</td>
-                                <td>{{ equipamento.localizacao }}</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
+        {# Modal de criação #}
+        {% set modal_id = 'modalNovoEquipamento' %}
+        {% include 'partials/_modal-cadastro-equipamento.html' with context %}
 
-                <!-- Mobile Cards -->
-                <div class="d-block d-md-none mt-4">
-                    <div class="panel-card">
+        <!-- Tabela -->
+        <div class="card-body">
+            <h4 class="fw-semibold mb-3 table-title">Equipamentos Recentes</h5>
+            <!-- Desktop -->
+            <div class="table-responsive d-none d-md-block card p-3">
+                <table class="table align-middle">
+                    <thead>
+                        <tr>
+                            <th>Patrimonio</th>
+                            <th>Tipo</th>
+                            <th>Marca</th>
+                            <th>Modelo</th>
+                            <th>Local</th>
+                        </tr>
+                    </thead>
+                    <tbody>
                         {% for equipamento in equipamentos_recentes %}
-                        <div class="top-row">
-                            <div class="equip-name">
-                                <strong>Patrimônio:</strong>
-                                {{ equipamento.patrimonio }}
-                            </div>
-                        </div>
-                        <div class="desc">
-                            <strong>Tipo:</strong>
-                            {{ equipamento.tipo }}
-                        </div>
-                        <div class="row g-2">
-                            <div class="col-6 meta"><strong>Marca:</strong> {{ equipamento.marca }}</div>
-                            <div class="col-6 meta"><strong>Modelo:</strong> {{ equipamento.modelo }}</div>
-                        </div>
-                        <div class="meta mt-2"><strong>Localização:</strong> {{ equipamento.localizacao }}</div>
+                        <tr>
+                            <td>{{ equipamento.patrimonio }}</td>
+                            <td>{{ equipamento.tipo }}</td>
+                            <td>{{ equipamento.marca }}</td>
+                            <td>{{ equipamento.modelo }}</td>
+                            <td>{{ equipamento.localizacao }}</td>
+                        </tr>
                         {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Mobile Cards -->
+            <div class="d-block d-md-none mt-4">
+                {% for equipamento in equipamentos_recentes %}
+                <div class="card mb-3 p-3">
+                    <div class="top-row">
+                        <div class="equip-name">
+                            <strong>Patrimônio:</strong>
+                            {{ equipamento.patrimonio }}
+                        </div>
+                    </div>
+                    <div class="desc">
+                        <strong>Tipo:</strong>
+                        {{ equipamento.tipo }}
+                    </div>
+                    <div class="col-6 meta">
+                        <strong>Marca:</strong> {{ equipamento.marca }}
+                    </div>
+                    <div class="col-6 meta">
+                        <strong>Modelo:</strong> {{ equipamento.modelo }}
+                    </div>
+                    <div class="meta">
+                        <strong>Localização:</strong> {{ equipamento.localizacao }}
                     </div>
                 </div>
-                <a href="{{ url_for('equipamento.listar_equipamentos') }}" class="footer-link mt-2 d-block">Visualizar todos →</a>
+                {% endfor %}
             </div>
+            <a href="{{ url_for('equipamento.listar_equipamentos') }}" class="footer-link mt-2 d-block">Visualizar todos →</a>
         </div>
     </div>
 {% endblock %}

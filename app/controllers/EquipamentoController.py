@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify, render_template, redirect, url_for, session, flash
 from app.database.connection import db
 from app.models.Equipamento import Equipamento
+from app.models.RegistroSuporte import RegistroSuporte
 from datetime import datetime
 from app.models.enums import StatusEquipamento
 from app.models.enums import TipoSuporte
@@ -130,7 +131,13 @@ def consultar_equipamento(id):
         if request.is_json:
             return jsonify(equipamento.to_dict())
         else:
-            return render_template('equipamentos/detalhes.html', equipamento=equipamento)
+            registros = (
+                RegistroSuporte.query
+                .filter(RegistroSuporte.id_equipamento == id)
+                .order_by(RegistroSuporte.data_suporte.desc())
+                .all()
+            )
+            return render_template('equipamentos/detalhes.html', equipamento=equipamento, registros=registros)
         
     except Exception as e:
         if request.is_json:
@@ -139,7 +146,7 @@ def consultar_equipamento(id):
             flash('Equipamento não encontrado.', 'danger')
             return redirect(url_for('equipamento.listar_equipamentos'))
         
-@equipamento_bp.route('/<int:id>', methods=['PUT', 'POST'])
+@equipamento_bp.route('/<int:id>/atualizar', methods=['PUT', 'POST'])
 def atualizar_equipamento(id):
     try:
         equipamento = Equipamento.query.get_or_404(id)

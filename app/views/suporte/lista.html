@@ -1,108 +1,205 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registros de Suporte</title>
-</head>
-<body>
-    <h1>Registros de Suporte</h1>
+{% extends "base.html" %}
+{% block title %}Suportes - invenTI{% endblock %}
 
-    <!-- Filtros -->
-    <form method="GET" action="{{ url_for('registro_suporte.listar_registros') }}">
-        <div>
-            <label>Equipamento</label>
-            <select name="equipamento">
-                <option value="all">Todos</option>
-                {% for e in opcoes_filtros.equipamentos %}
-                <option value="{{ e.id }}" {{ 'selected' if filtros.equipamento and filtros.equipamento == (e.id|string) }}>{{ e.descricao }}</option>
-                {% endfor %}
-            </select>
+{% block header %}
+  {% include 'partials/_header.html' %}
+{% endblock %}
 
-            <label>Tipo de Suporte</label>
-            <select name="tipo_suporte">
-                <option value="all">Todos</option>
-                {% for t in opcoes_filtros.tipo_suporte %}
-                <option value="{{ t }}" {{ 'selected' if filtros.tipo_suporte and filtros.tipo_suporte == (t|string) }}>{{ t }}</option>
-                {% endfor %}
-            </select>
+{% block content %}
+    <div class="container py-4">
+        <!-- Título e subtítulo -->
+        <h2 class="fw-semibold mb-1">Suportes</h2>
+        <p class="text-muted mb-4">Gerencie e acompanhe todos os suportes dos equipamentos</p>
 
-            <label>Responsável</label>
-            <select name="responsavel">
-                <option value="all">Todos</option>
-                {% for r in opcoes_filtros.responsavel %}
-                <option value="{{ r.id }}" {{ 'selected' if filtros.responsavel and filtros.responsavel == (r.id|string) }}>{{ r.nome }}</option>
-                {% endfor %}
-            </select>
+        <!-- Filtros -->
+        <form action="{{ url_for('registro_suporte.listar_registros') }}" method="GET">
+            <div class="card mb-4 filters">
+                <div class="card-body">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-12 col-md-3">
+                            <label class="form-label">Equipamento</label>
+                            <select class="form-select" name="equipamento">
+                                <option value="all" selected>Todos</option>
+                                {% for eq in opcoes_filtros.equipamentos %}
+                                <option value="{{ eq.id }}" {{ 'selected' if filtros.equipamento and filtros.equipamento == (eq.id|string) }}>{{ eq.descricao }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-12 col-md-3">
+                            <label class="form-label">Tipo de Suporte</label>
+                            <select class="form-select" name="tipo_suporte">
+                                <option value="all" selected>Todos</option>
+                                {% for t in opcoes_filtros.tipo_suporte %}
+                                <option value="{{ t }}" {{ 'selected' if filtros.tipo_suporte and filtros.tipo_suporte == (t|string) }}>{{ t }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-12 col-md-3">
+                            <label class="form-label">Responsável</label>
+                            <select class="form-select" name="responsavel">
+                                <option selected value="all">Todos</option>
+                                {% for r in opcoes_filtros.responsavel %}
+                                <option value="{{ r }}" {{ 'selected' if filtros.responsavel and filtros.responsavel == (r|string) }}>{{ r }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-12 col-md-3">
+                            <label class="form-label">Pesquisa</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fa-solid fa-magnifying-glass"></i></span>
+                                <input type="text" name="pesquisa" class="form-control" placeholder="Patrimônio, Série, Modelo..." value="{{ filtros.pesquisa or '' }}" />
+                            </div>
+                        </div>
+                    </div>
+    
+                    <div class="d-flex align-items-center mt-3">
+                        <button type="submit" class="btn btn-outline-secondary me-2">
+                            <i class="fa-solid fa-filter"></i> Filtrar
+                        </button>
+                        <a href="{{ url_for('registro_suporte.listar_registros') }}" class="btn btn-outline-secondary">
+                            <i class="fa-solid fa-rotate"></i> Resetar
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </form>
 
-            <label>Pesquisa</label>
-            <input type="text" name="pesquisa" value="{{ filtros.pesquisa or '' }}" placeholder="Patrimônio, modelo...">
+        <!-- Tabela -->
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h6 class="section-title mb-0">Registros de Suporte</h6>
+                </div>
 
-            <button type="submit">Filtrar</button>
-            <a href="{{ url_for('registro_suporte.listar_registros') }}">Resetar</a>
-        </div>
-    </form>
+                <!-- Desktop -->
+                <div class="table-responsive d-none d-md-block">
+                    <table class="table align-middle">
+                        <thead>
+                            <tr>
+                                <th>Equipamento</th>
+                                <th>Tipo de Suporte</th>
+                                <th>Responsável</th>
+                                <th>Data</th>
+                                <th>Custo</th>
+                                <th class="text-center" style="width: 120px;">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for registro in registros %}
+                            <tr>
+                                <td>
+                                    {% if registro.equipamento %}
+                                        {{ registro.equipamento.patrimonio }} - {{ registro.equipamento.marca }} {{ registro.equipamento.modelo }}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                                <td>{{ registro.tipo_suporte }}</td>
+                                <td>{{ registro.responsavel }}</td>
+                                <td>{{ registro.data_suporte.strftime('%d-%m-%Y') if registro.data_suporte else '' }}</td>
+                                <td>R${{ "%.2f"|format(registro.custo) }}</td>
+                                <td class="text-center table-actions">
+                                    <button class="btn btn-outline-secondary btn-sm" title="Ver"><i class="fa-solid fa-eye"></i></button>
+                                    <button class="btn btn-outline-secondary btn-sm" title="Editar"><i class="fa-solid fa-pencil"></i></button>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="5" class="text-center text-muted py-3">Nenhum registro encontrado.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
 
-    <!-- Resultados -->
-    <p>Mostrando {{ pagination.total if pagination else 0 }} resultados</p>
+                    <!-- Paginação -->
+                    <div class="d-flex justify-content-between align-items-center mt-2">
+                        <span class="text-muted" style="font-size:.9rem;">Mostrando {{ pagination.page * pagination.per_page - pagination.per_page + 1 }}-{{ [pagination.page * pagination.per_page, pagination.total] | min }} de {{ pagination.total }} resultados</span>
+                        <nav>
+                            <ul class="pagination pagination-sm mb-0">
+                                {% if pagination.has_prev %}
+                                <li class="page-item">
+                                    <a class="page-link" href="{{ url_for('equipamento.listar_equipamentos', page=pagination.prev_num, **filtros) }}">Anterior</a>
+                                </li>
+                                {% endif %}
+                                {% for page_num in pagination.iter_pages() %}
+                                <li class="page-item {{ 'active' if page_num == pagination.page }}">
+                                    <a class="page-link" href="{{ url_for('equipamento.listar_equipamentos', page=page_num, **filtros) }}">{{ page_num }}</a>
+                                </li>
+                                {% endfor %}
+                                {% if pagination.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="{{ url_for('equipamento.listar_equipamentos', page=pagination.next_num, **filtros) }}">Próxima</a>
+                                </li>
+                                {% endif %}
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
 
-    <table border="1" cellpadding="6" cellspacing="0">
-        <thead>
-            <tr>
-                <th>Data</th>
-                <th>Equipamento</th>
-                <th>Tipo</th>
-                <th>Responsável</th>
-                <th>Descrição</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for registro in registros %}
-            <tr>
-                <td>{{ registro.data_suporte.strftime('%Y-%m-%d') if registro.data_suporte else '' }}</td>
-                <td>
-                    {% if registro.equipamento %}
-                        {{ registro.equipamento.patrimonio }} - {{ registro.equipamento.marca }} {{ registro.equipamento.modelo }}
+                <!-- Mobile (cards) -->
+                <div class="d-block d-md-none">
+                    {% for registro in registros %}
+                    <div class="panel-card">
+                        <div>
+                            <strong>
+                                {% if registro.equipamento %}
+                                {{ registro.equipamento.patrimonio }} - {{ registro.equipamento.marca }} {{ registro.equipamento.modelo }}
+                                {% else %}
+                                -
+                                {% endif %}
+                            </strong>
+                        </div>
+                        <div class="top-row">
+                            <div class="equip-name">
+                                <i class="fa-solid fa-screwdriver-wrench"></i> {{ registro.tipo_suporte }}
+                            </div>
+                            <div class="meta">{{ registro.data_suporte.strftime('%d-%m-%Y') if registro.data_suporte else '' }}
+                            </div>
+                        </div>
+                        <div class="desc">
+                            <strong>Responsável:</strong> {{ registro.responsavel }}
+                        </div>
+                        <div class="desc">
+                            <strong>Custo:</strong> R${{ "%.2f"|format(registro.custo) }}
+                        </div>
+                        <div class="d-flex gap-2 mt-2">
+                            <button class="btn btn-outline-secondary btn-sm"><i class="fa-solid fa-eye"></i></button>
+                            <button class="btn btn-outline-secondary btn-sm"><i class="fa-solid fa-pen"></i></button>
+                        </div>
+                    </div>
                     {% else %}
-                        -
-                    {% endif %}
-                </td>
-                <td>{{ registro.tipo_suporte }}</td>
-                <td>{{ registro.responsavel }}</td>
-                <td>{{ registro.descricao }}</td>
-            </tr>
-            {% else %}
-            <tr>
-                <td colspan="5">Nenhum registro encontrado.</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-
-    <!-- Paginação simples -->
-    {% if pagination %}
-    <div>
-        {% if pagination.has_prev %}
-            <a href="{{ url_for('registro_suporte.listar_registros', page=pagination.prev_num, **filtros) }}">Anterior</a>
-        {% endif %}
-
-        {% for p in pagination.iter_pages() %}
-            {% if p %}
-                {% if p == pagination.page %}
-                    <strong>{{ p }}</strong>
-                {% else %}
-                    <a href="{{ url_for('registro_suporte.listar_registros', page=p, **filtros) }}">{{ p }}</a>
-                {% endif %}
-            {% else %}
-                ...
-            {% endif %}
-        {% endfor %}
-
-        {% if pagination.has_next %}
-            <a href="{{ url_for('registro_suporte.listar_registros', page=pagination.next_num, **filtros) }}">Próxima</a>
-        {% endif %}
+                    <p class="text-muted text-center">Nenhum registro encontrado.</p>
+                    {% endfor %}
+                    
+                    <!-- Paginação (mobile) -->
+                    <div class="d-flex justify-content-between align-items-center mt-2">
+                        <span class="text-muted" style="font-size:.9rem;">Mostrando {{ pagination.page * pagination.per_page - pagination.per_page + 1 }}-{{ [pagination.page * pagination.per_page, pagination.total] | min }} de {{ pagination.total }} resultados</span>
+                        <nav>
+                            <ul class="pagination pagination-sm mb-0">
+                                {% if pagination.has_prev %}
+                                <li class="page-item">
+                                    <a class="page-link" href="{{ url_for('equipamento.listar_equipamentos', page=pagination.prev_num, **filtros) }}">
+                                        <i class="fa-solid fa-chevron-left"></i>
+                                    </a>
+                                </li>
+                                {% endif %}
+                                {% for page_num in pagination.iter_pages() %}
+                                <li class="page-item {{ 'active' if page_num == pagination.page }}">
+                                    <a class="page-link" href="{{ url_for('equipamento.listar_equipamentos', page=page_num, **filtros) }}">{{ page_num }}</a>
+                                </li>
+                                {% endfor %}
+                                {% if pagination.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="{{ url_for('equipamento.listar_equipamentos', page=pagination.next_num, **filtros) }}">
+                                        <i class="fa-solid fa-chevron-right"></i>
+                                    </a>
+                                </li>
+                                {% endif %}
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-    {% endif %}
-
-</body>
-</html>
+{% endblock %}

@@ -102,6 +102,20 @@
     color: #555;
 }
 
+.active>.page-link, .page-link.active {
+    background-color: #212529;
+    border-color: #212529;
+}
+
+.page-link {
+    color: #212529;
+}
+
+.page-link:hover {
+    color: #212529;
+}
+
+
 /* ====== Mobile cards (painel) ====== */
 @media (max-width: 767.98px) {
     .panel-card {
@@ -111,12 +125,14 @@
         padding: 1rem;
         margin-bottom: 1rem;
     }
+
     .panel-card .top-row {
         display: flex;
         justify-content: space-between;
         align-items: flex-start;
         margin-bottom: .35rem;
     }
+
     .panel-card .equip-name {
         font-weight: 600;
         font-size: .95rem;
@@ -124,6 +140,7 @@
         align-items: center;
         gap: .35rem;
     }
+
     .panel-card .desc {
         font-size: .9rem;
         white-space: nowrap;
@@ -131,8 +148,13 @@
         text-overflow: ellipsis;
         margin-bottom: .25rem;
     }
+    
     .panel-card .meta {
         font-size: .8rem;
         color:  var(--text-muted);
+    }
+
+    .btn-full {
+        width: 100%;
     }
 }

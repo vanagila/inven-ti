@@ -29,6 +29,42 @@
                 icon.classList.replace('fa-eye-slash', 'fa-eye');
             }
         }
-  </script>
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            let modalEditar = document.getElementById('modalEditar');
+            if (!modalEditar) return;
+
+            modalEditar.addEventListener('show.bs.modal', function (event) {
+                let button = event.relatedTarget; // botão que abriu o modal
+                // pegar dados do botão
+                let form = document.getElementById('modalEditar-form');
+                if (!form) return;
+
+                // campos
+                let fields = ['patrimonio','tipo','marca','modelo','numero_serie','localizacao','data_aquisicao','status','observacoes'];
+                fields.forEach(function(name){
+                    let el = form.querySelector('[name="'+name+'"]');
+                    if (!el) return;
+                    let val = button.getAttribute('data-'+name);
+                    if (val === null) val = '';
+                    if (el.tagName.toLowerCase() === 'select'){
+                        // selecionar opção que bate com valor
+                        for (let i=0;i<el.options.length;i++){
+                            el.options[i].selected = (el.options[i].value === val) || (el.options[i].text === val);
+                        }
+                    } else {
+                        el.value = val;
+                    }
+                });
+
+                // setar action do form se o botão tiver data-update-url
+                let updateUrl = button.getAttribute('data-update-url');
+                if (updateUrl) {
+                    form.action = updateUrl;
+                }
+            });
+        });
+    </script>
 </body>
 </html>

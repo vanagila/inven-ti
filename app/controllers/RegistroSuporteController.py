@@ -68,9 +68,8 @@ def listar_registros():
         query = (
             RegistroSuporte.query
             .join(Equipamento, RegistroSuporte.id_equipamento == Equipamento.id)
-            .outerjoin(Usuario, RegistroSuporte.id_usuario == Usuario.id)
-        )
 
+        )
 
         if equipamento and equipamento != 'all':
             equipamento_id = int(equipamento)
@@ -93,7 +92,7 @@ def listar_registros():
                     func.lower(Equipamento.patrimonio).contains(term),
                     func.lower(Equipamento.modelo).contains(term),
                     func.lower(Equipamento.marca).contains(term),
-                    func.lower(Usuario.nome).contains(term),
+                    func.lower(RegistroSuporte.responsavel).contains(term),
                     func.lower(RegistroSuporte.descricao).contains(term)
                 )
             )
@@ -114,7 +113,7 @@ def listar_registros():
         
         opcoes_filtros = {
             'tipo_suporte': [tipo[0] for tipo in db.session.query(RegistroSuporte.tipo_suporte).distinct().all()],
-            'responsavel': [{'id': t[1], 'nome': t[0]} for t in db.session.query(Usuario.nome, Usuario.id).all()],
+            'responsavel': [resp[0] for resp in db.session.query(RegistroSuporte.responsavel).distinct().all()],
             'equipamentos': [{'id': e[0], 'descricao': f"{e[1]} - {e[2]} {e[3]}"} for e in db.session.query(Equipamento.id, Equipamento.patrimonio, Equipamento.marca, Equipamento.modelo).all()]
         }
 
