@@ -5,6 +5,8 @@ from app.models.RegistroSuporte import RegistroSuporte
 from datetime import datetime
 from app.models.enums import StatusEquipamento
 from app.models.enums import TipoSuporte
+from sqlalchemy import func, or_
+
 equipamento_bp = Blueprint('equipamento', __name__, url_prefix='/equipamentos')
 
 @equipamento_bp.route('/', methods=['GET', 'POST'])
@@ -31,11 +33,11 @@ def cadastrar_equipamento():
 
         if Equipamento.query.filter_by(patrimonio=dados.get('patrimonio')).first():
             flash('Este número de patrimônio já está cadastrado.', 'danger')
-            return redirect(url_for('equipamento.cadastrar_equipamento'))
+            return redirect(url_for('equipamento.listar_equipamentos'))
 
         if Equipamento.query.filter_by(numero_serie=dados.get('numero_serie')).first():
             flash('Este número de série já está cadastrado.', 'danger')
-            return redirect(url_for('equipamento.cadastrar_equipamento'))
+            return redirect(url_for('equipamento.listar_equipamentos'))
 
         equipamento = Equipamento(**dados)
         db.session.add(equipamento)
@@ -45,14 +47,14 @@ def cadastrar_equipamento():
             return jsonify(equipamento.to_dict()), 201
         else:
             flash('Equipamento cadastrado com sucesso!', 'success')
-            return redirect(url_for('equipamento.cadastrar_equipamento'))
+            return redirect(url_for('equipamento.listar_equipamentos'))
 
     except Exception as e:
         db.session.rollback()
         if request.is_json:
             return jsonify({'erro': str(e)}), 400
         else:
-            flash(f'Erro ao cadastrar equipamento: {str(e)}', 'danger')
+            flash(f'Erro ao cadastrar equipamento', 'danger')
             return redirect(url_for('equipamento.cadastrar_equipamento'))
         
 @equipamento_bp.route('/lista', methods=['GET'])
@@ -80,12 +82,13 @@ def listar_equipamentos():
             query = query.filter(Equipamento.marca.contains(marca))
 
         if pesquisa:
+            term = pesquisa.lower()
             query = query.filter(
-                db.or_(
-                    Equipamento.patrimonio.contains(pesquisa),
-                    Equipamento.modelo.contains(pesquisa),
-                    Equipamento.numero_serie.contains(pesquisa),
-                    Equipamento.marca.contains(pesquisa)
+                or_(
+                    func.lower(Equipamento.patrimonio).contains(term),
+                    func.lower(Equipamento.modelo).contains(term),
+                    func.lower(Equipamento.numero_serie).contains(term),
+                    func.lower(Equipamento.marca).contains(term)
                 )
             )
 
@@ -103,16 +106,22 @@ def listar_equipamentos():
                 'equipamentos': [eq.to_dict() for eq in equipamentos]
             }), 200
         
+        opcoes_filtros = {
+            'localizacao': [local[0] for local in db.session.query(Equipamento.localizacao).distinct().all()],
+            'tipo': [tip[0] for tip in db.session.query(Equipamento.tipo).distinct().all()]
+        }
+        
         return render_template('equipamentos/lista.html',
             equipamentos=equipamentos,
             pagination=pagination,
             filtros={
                 'tipo': tipo,
                 'status': status,
-                'localizacao': localizacao,
+                'tipo': localizacao,
                 'marca': marca,
                 'pesquisa': pesquisa
-            }
+            },
+            opcoes_filtros=opcoes_filtros
         )
 
     except Exception as e:
@@ -121,7 +130,7 @@ def listar_equipamentos():
         if request.is_json:
             return jsonify({'erro': str(e)}), 500
         flash(f'Erro ao listar equipamentos: {str(e)}', 'danger')
-        return render_template('equipamentos/lista.html', equipamentos=[], pagination=None, filtros={})
+        return render_template('equipamentos/lista.html', equipamentos=[], pagination=None, filtros={}, opcoes_filtros={})
 
 @equipamento_bp.route('/<int:id>', methods=['GET'])
 def consultar_equipamento(id):
@@ -137,7 +146,8 @@ def consultar_equipamento(id):
                 .order_by(RegistroSuporte.data_suporte.desc())
                 .all()
             )
-            return render_template('equipamentos/detalhes.html', equipamento=equipamento, registros=registros)
+
+            return render_template('equipamentos/detalhes.html', equipamento=equipamento, registros=registros, tipos_suporte=TipoSuporte.todos(), equipamento_selecionado=equipamento)
         
     except Exception as e:
         if request.is_json:

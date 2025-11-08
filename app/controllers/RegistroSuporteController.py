@@ -2,6 +2,7 @@ from flask import Blueprint, request, jsonify, render_template, redirect, url_fo
 from app.database.connection import db
 from app.models import Equipamento, Usuario
 from app.models.RegistroSuporte import RegistroSuporte
+from app.models.enums import TipoSuporte
 from datetime import datetime
 from sqlalchemy import or_, func
 
@@ -20,7 +21,8 @@ def registrar_suporte():
                 'suporte/cadastro.html',
                 equipamentos=equipamentos,
                 responsaveis=responsaveis,
-                equipamento_selecionado=equipamento_selecionado
+                equipamento_selecionado=equipamento_selecionado,
+                tipos_suporte=TipoSuporte.todos()
         )
             
     try:

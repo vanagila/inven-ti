@@ -14,8 +14,9 @@ class TipoSuporte:
     MANUTENCAO_PREVENTIVA = 'Manutenção Preventiva'
     ATUALIZACAO_SOFTWARE = 'Atualização de Software'
     TROCA_PECA = 'Troca de Peça'
+    OUTRO = 'Outro'
     
     @classmethod
     def todos(cls):
         return [cls.MANUTENCAO_CORRETIVA, cls.MANUTENCAO_PREVENTIVA, 
-                cls.ATUALIZACAO_SOFTWARE, cls.TROCA_PECA]
+                cls.ATUALIZACAO_SOFTWARE, cls.TROCA_PECA, cls.OUTRO]

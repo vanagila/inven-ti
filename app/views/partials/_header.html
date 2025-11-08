@@ -25,7 +25,7 @@
                     <a class="nav-link {% if request.endpoint == 'equipamento.listar_equipamentos' %}active{% endif %}" href="{{ url_for('equipamento.listar_equipamentos') }}">Equipamentos</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link {% if request.endpoint == 'equipamento.listar_registros' %}active{% endif %}" href="{{ url_for('registro_suporte.listar_registros') }}">Suportes</a>
+                    <a class="nav-link {% if request.endpoint == 'registro_suporte.listar_registros' %}active{% endif %}" href="{{ url_for('registro_suporte.listar_registros') }}">Suportes</a>
                 </li>
             </ul>
         </nav>

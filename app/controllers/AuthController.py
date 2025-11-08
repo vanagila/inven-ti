@@ -103,11 +103,10 @@ def login():
                 # flash(f'Bem vindo(a), {usuario.nome}!', 'success')
                 return redirect(url_for('auth.painel'))
         else:
-            mensagem = 'Email ou senha incorretos.'
             if request.is_json:
-                return jsonify({'erro': mensagem}), 401
+                return jsonify({'erro'}), 401
             else:
-                flash(mensagem, 'danger')
+                flash('Email ou senha incorretos.', 'danger')
                 return redirect(url_for('auth.login'))
 
     return render_template('auth/login.html')
@@ -119,7 +118,6 @@ def logout():
         session.pop('user_nome', None)
         session.pop('user_email', None)
         session.pop('is_admin', None)
-
         session.clear()
 
         flash('Você saiu da sua conta com sucesso.', 'info')
