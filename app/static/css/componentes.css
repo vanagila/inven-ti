@@ -39,6 +39,12 @@
     color: #374151;
 }
 
+.badge-soft.warning {
+    background-color: #fff7ed;
+    border-color: #ffd6a5;
+    color: #92400e;
+}
+
 /* Informações (detalhes do equipamento) */
 .info-label {
     color: var(--text-muted);
@@ -147,11 +153,6 @@
         overflow: hidden;
         text-overflow: ellipsis;
         margin-bottom: .25rem;
-    }
-    
-    .panel-card .meta {
-        font-size: .8rem;
-        color:  var(--text-muted);
     }
 
     .btn-full {

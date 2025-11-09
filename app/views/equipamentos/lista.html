@@ -7,6 +7,17 @@
 
 {% block content %}
     <div class="container py-4">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+			{% if messages %}
+				<div class="mb-3">
+					{% for category, message in messages %}
+					<div class="alert {% if category == 'success' %}alert-success{% else %}alert-danger{% endif %} text-center" role="alert">
+						{{ message }}
+					</div>
+					{% endfor %}
+				</div>
+			{% endif %}
+		{% endwith %}
         <h2 class="fw-semibold mb-1">Equipamentos</h2>
         <p class="text-muted mb-4">Gerencie e acompanhe todos os equipamentos de TI da sua organização</p>
 
@@ -18,14 +29,14 @@
                         <div class="col-12 col-md-3">
                             <label class="form-label">Tipo de Equipamento</label>
                             <select class="form-select" name="tipo">
-                                <option value="" selected>Todos os Tipos</option>
-                                <option value="Notebook" {{ 'selected' if filtros.tipo == 'Notebook' }}>Notebook</option>
-                                <option value="Desktop" {{ 'selected' if filtros.tipo == 'Desktop' }}>Desktop</option>
-                                <option value="Impressora" {{ 'selected' if filtros.tipo == 'Impressora' }}>Impressora</option>
-                                <option value="Servidor" {{ 'selected' if filtros.tipo == 'Servidor' }}>Servidor</option>
-                                <option value="Monitor"  {{ 'selected' if filtros.tipo == 'Monitor' }}>Monitor</option>
+                                <option value="all" selected>Todos os Tipos</option>
+                               <option selected value="all">Todos</option>
+                                {% for t in opcoes_filtros.tipo %}
+                                <option value="{{ t }}" {{ 'selected' if filtros.tipo and filtros.tipo == (t|string) }}>{{ t }}</option>
+                                {% endfor %}
                             </select>
                         </div>
+
                         <div class="col-12 col-md-3">
                             <label class="form-label">Status</label>
                             <select class="form-select" name="status">
@@ -35,16 +46,17 @@
                                 <option value="Desativado" {{ 'selected' if filtros.status == 'Desativado' }}>Desativado</option>
                             </select>
                         </div>
+
                         <div class="col-12 col-md-3">
                             <label class="form-label">Local</label>
                             <select class="form-select" name="localizacao">
-                                <option selected value="">Todos Locais</option>
-                                <option value="Recepção" {{ 'selected' if filtros.localizacao == 'Recepção' }}>Recepção</option>
-                                <option value="Sala de Servidores" {{ 'selected' if filtros.localizacao == 'Sala de Servidores' }}>Sala de Servidores</option>
-                                <option value="Presidência" {{ 'selected' if filtros.localizacao == 'Presidência' }}>Presidência</option>
-                                <option value="Escritório Pessoal" {{ 'selected' if filtros.localizacao == 'Escritório Pessoal' }}>Escritório Pessoal</option>
+                                <option selected value="all">Todos</option>
+                                {% for l in opcoes_filtros.localizacao %}
+                                <option value="{{ l }}" {{ 'selected' if filtros.localizacao and filtros.localizacao == (l|string) }}>{{ l }}</option>
+                                {% endfor %}
                             </select>
                         </div>
+
                         <div class="col-12 col-md-3">
                             <label class="form-label">Pesquisa</label>
                             <div class="input-group">
@@ -52,6 +64,7 @@
                                 <input type="text" name="pesquisa" class="form-control" placeholder="Patrimônio, Série, Modelo..." value="{{ filtros.pesquisa or '' }}" />
                             </div>
                         </div>
+
                     </div>
     
                     <div class="d-flex align-items-center mt-3">
@@ -73,10 +86,6 @@
                 <i class="fa-solid fa-plus me-2"></i>Novo Equipamento
             </a>
         </div>
-
-        {# Modal de criação #}
-        {% set modal_id = 'modalNovoEquipamento' %}
-        {% include 'partials/_modal-cadastro-equipamento.html' with context %}
 
         <!-- Tabela (desktop) -->
         <div class="card d-none d-md-block">
@@ -103,7 +112,7 @@
                                 <td>{{ equipamento.modelo }}</td>
                                 <td>{{ equipamento.localizacao }}</td>
                                 <td>
-                                    <span class="badge-soft {{ 'success' if equipamento.status == 'Em Uso' else 'warning' if equipamento.status == 'Em Manutenção' else 'secondary' }}">
+                                    <span class="badge-soft {{ 'success' if equipamento.status == 'Em Uso' else 'warning' if equipamento.status == 'Em Manutenção' else 'neutral' }}">
                                         {{ equipamento.status }}
                                     </span>
                                 </td>
@@ -166,40 +175,49 @@
 
             <!-- Card-->
             {% for equipamento in equipamentos %}
-            <div class="equipment-card mb-3 p-3 card">
-                <div class="d-flex align-items-center justify-content-between">
+            <div class="panel-card mb-3 p-3 card">
+                <div class="d-flex justify-content-between flex-column">
                     <div class="title fw-semibold">{{ equipamento.patrimonio }} — {{ equipamento.marca }} {{ equipamento.modelo }}</div>
-                    <div class="d-flex justify-content-end mt-2">
-                        <div class="dropdown">
-                            <button class="btn btn-outline-secondary btn-sm menu-btn" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="fa-solid fa-ellipsis"></i>
-                            </button>
-                            <ul class="dropdown-menu dropdown-menu-end shadow-sm">
-                                <li><a class="dropdown-item" href="{{ url_for('equipamento.consultar_equipamento', id=equipamento.id) }}">Ver Equipamento</a></li>
-                                <li>
-                                    <button type="button" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modalEditar"
-                                    data-id="{{ equipamento.id }}"
-                                    data-patrimonio="{{ equipamento.patrimonio }}"
-                                    data-tipo="{{ equipamento.tipo }}"
-                                    data-marca="{{ equipamento.marca }}"
-                                    data-modelo="{{ equipamento.modelo }}"
-                                    data-numero_serie="{{ equipamento.numero_serie }}"
-                                    data-localizacao="{{ equipamento.localizacao }}"
-                                    data-data_aquisicao="{{ equipamento.data_aquisicao.strftime('%Y-%m-%d') if equipamento.data_aquisicao else '' }}"
-                                    data-status="{{ equipamento.status }}"
-                                    data-observacoes="{{ equipamento.observacoes or '' }}"
-                                    data-update-url="{{ url_for('equipamento.atualizar_equipamento', id=equipamento.id) }}"
-                                >Editar</button>
-                                </li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item text-danger" href="#">Excluir</a></li>
-                            </ul>
-                        </div>
+
+                    <div class="desc">
+                        <strong>Tipo:</strong>
+                        {{ equipamento.tipo }}
+                    </div>
+                    
+                    <div class="desc">
+                       <span class="badge-soft {{ 'success' if equipamento.status == 'Em Uso' else 'warning' if equipamento.status == 'Em Manutenção' else 'neutral' }}">
+                            {{ equipamento.status }}
+                        </span>
+                    </div>
+
+                    <div class="desc">
+                        <strong>Local:</strong>
+                        {{ equipamento.localizacao }}
                     </div>
                 </div>
-                <div class="subline mt-1">{{ equipamento.tipo }}</div>
-                <div class="mt-2"><span class="badge-soft success">{{ equipamento.status }}</span></div>
-                <div class="meta mt-1">Local: {{ equipamento.localizacao }}</div>
+
+                <div class="d-flex gap-2 mt-2">
+                    <a class="btn btn-outline-secondary btn-sm" href="{{ url_for('equipamento.consultar_equipamento', id=equipamento.id) }}"><i class="fa-solid fa-eye"></i></a>
+
+                    <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#modalEditar"
+                        data-id="{{ equipamento.id }}"
+                        data-patrimonio="{{ equipamento.patrimonio }}"
+                        data-tipo="{{ equipamento.tipo }}"
+                        data-marca="{{ equipamento.marca }}"
+                        data-modelo="{{ equipamento.modelo }}"
+                        data-numero_serie="{{ equipamento.numero_serie }}"
+                        data-localizacao="{{ equipamento.localizacao }}"
+                        data-data_aquisicao="{{ equipamento.data_aquisicao.strftime('%Y-%m-%d') if equipamento.data_aquisicao else '' }}"
+                        data-status="{{ equipamento.status }}"
+                        data-observacoes="{{ equipamento.observacoes or '' }}"
+                        data-update-url="{{ url_for('equipamento.atualizar_equipamento', id=equipamento.id) }}">
+                        <i class="fa-solid fa-pencil"></i>
+                    </button>
+
+                    <a class="btn btn-outline-secondary btn-sm" href="#">
+                        <i class="fa-solid fa-circle-xmark"></i>
+                    </a>
+                </div>
             </div>
             {% endfor %}
 
@@ -233,7 +251,11 @@
         </div>
         <!-- ===== /MOBILE ===== -->
 
-        {# Modal de edição (único, será preenchido via JS) #}
+        {# Modal de criação #}
+        {% set modal_id = 'modalNovoEquipamento' %}
+        {% include 'partials/_modal-cadastro-equipamento.html' with context %}
+        
+        {# Modal de edição #}
         {% set modal_id = 'modalEditar' %}
         {% set modal_title = 'Editar Equipamento' %}
         {% include 'partials/_modal-cadastro-equipamento.html' with context %}

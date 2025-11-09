@@ -2,8 +2,10 @@ from flask import Blueprint, request, jsonify, render_template, redirect, url_fo
 from app.database.connection import db
 from app.models import Equipamento, Usuario
 from app.models.RegistroSuporte import RegistroSuporte
+from app.models.enums import TipoSuporte
 from datetime import datetime
 from sqlalchemy import or_, func
+from types import SimpleNamespace
 
 registro_suporte_bp = Blueprint('registro_suporte', __name__, url_prefix='/registro-suporte')
 
@@ -20,7 +22,8 @@ def registrar_suporte():
                 'suporte/cadastro.html',
                 equipamentos=equipamentos,
                 responsaveis=responsaveis,
-                equipamento_selecionado=equipamento_selecionado
+                equipamento_selecionado=equipamento_selecionado,
+                tipos_suporte=TipoSuporte.todos()
         )
             
     try:
@@ -127,15 +130,92 @@ def listar_registros():
                 'data_suporte': data_suporte,
                 'pesquisa': pesquisa
             },
-            opcoes_filtros=opcoes_filtros
+            opcoes_filtros=opcoes_filtros,
+            tipos_suporte=TipoSuporte.todos()
             
         )
     
     except Exception as e:
         db.session.rollback()
+        fake_pagination = SimpleNamespace(
+            page=1, per_page=5, total=0,
+            has_prev=False, has_next=False,
+            prev_num=None, next_num=None,
+            iter_pages=lambda: []
+        )
 
         if request.is_json:
             return jsonify({'erro': str(e)}), 500
         flash(f'Erro ao listar registros: {str(e)}', 'danger')
         return render_template('suporte/lista.html',
-            registros=[], pagination=None, filtros={}, opcoes_filtros={})
+            registros=[], pagination=fake_pagination, filtros={}, opcoes_filtros={})
+
+@registro_suporte_bp.route('/<int:id>/atualizar', methods=['PUT', 'POST'])
+def atualizar_suporte(id):
+    try:
+        suporte = RegistroSuporte.query.get_or_404(id)
+
+        user_id = session.get('user_id')
+        if not user_id:
+            if request.is_json:
+                return jsonify({'erro': 'Usuário não autenticado'}), 401
+            else:
+                flash('É necessário estar logado.', 'danger')
+                return redirect(url_for('auth.login'))
+
+        if request.is_json:
+            dados = request.get_json()
+        else:
+            dados = request.form.to_dict()
+
+        campos_permitidos = ['descricao', 'data_suporte', 'responsavel', 'custo']
+        campos_atualizados = []
+
+        for campo in campos_permitidos:
+            if campo in dados and dados[campo] is not None:
+                setattr(suporte, campo, dados[campo])
+                campos_atualizados.append(campo)
+
+        db.session.commit()
+
+        if request.is_json:
+            return jsonify({
+                'mensagem': 'Suporte atualizado com sucesso!',
+                'campos_atualizados': campos_atualizados,
+                'suporte': suporte.to_dict()
+            })
+        else:
+            flash('Suporte atualizado com sucesso!', 'success')
+            return redirect(url_for('registro_suporte.listar_registros', id=id))
+    
+    except Exception as e:
+        db.session.rollback()
+        if request.is_json:
+            return jsonify({'erro': str(e)}), 400
+        else:
+            flash('Erro ao atualizar suporte.' 'danger')
+            return redirect(url_for('registro_suporte.listar_registros', id=id))
+
+@registro_suporte_bp.route('/<int:id>', methods=['GET'])
+def consultar_suporte(id):
+    try:
+        suporte = RegistroSuporte.query.get_or_404(id)
+
+        if request.is_json:
+            return jsonify(suporte.to_dict())
+        else:
+            registros = (
+                RegistroSuporte.query
+                .filter(RegistroSuporte.id_suporte == id)
+                .order_by(RegistroSuporte.data_suporte.desc())
+                .all()
+            )
+
+            return render_template('suportes/detalhes.html', suporte=suporte, registros=registros, tipos_suporte=TipoSuporte.todos(), suporte_selecionado=suporte)
+        
+    except Exception as e:
+        if request.is_json:
+            return jsonify({'erro': str(e)}), 404
+        else:
+            flash('suporte não encontrado.', 'danger')
+            return redirect(url_for('suporte.listar_suportes'))
