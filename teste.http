@@ -1,2 +1,11 @@
-GET http://127.0.0.1:5000/equipamentos/lista
+PUT http://127.0.0.1:5000/registro-suporte/5/atualizar
 Content-Type: application/json
+
+{
+  "id_equipamento": 1,
+  "descricao": "Manutenção preventiva realizada",
+  "data_suporte": "2024-01-15",
+  "tipo_suporte": "MANUTENCAO_PREVENTIVA",
+  "responsavel": "Joana",
+  "custo": 150.50
+}

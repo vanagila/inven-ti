@@ -48,50 +48,43 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Handler para o modal de novo suporte (modalNovoSuporte) - inicializa/limpa ao abrir
-    let modalNovoSuporte = document.getElementById('modalNovoSuporte');
-    if (modalNovoSuporte) {
-        modalNovoSuporte.addEventListener('show.bs.modal', function (event) {
-            let form = modalNovoSuporte.querySelector('form#modalNovoSuporte-form');
-            if (!form) return;
-            
-            form.reset();
+    // Handler para o modal de novo suporte (modalNovoSuporte)
+    const modal = document.getElementById('modalSuporte');
+    const form = document.getElementById('formSuporte');
+    const title = modal.querySelector('.modal-title');
+    const btnSalvar = document.getElementById('btnSalvar');
 
-            // se o modal foi aberto a partir de um botão com data-attributes, preencha alguns campos
-            let trigger = event && event.relatedTarget ? event.relatedTarget : null;
-            if (trigger && trigger.dataset) {
-                // Preencher campos hidden com informações do equipamento
-                ['id_equipamento', 'patrimonio', 'marca', 'modelo'].forEach(field => {
-                    let input = form.querySelector(`input[name="${field}"]`);
-                    if (input && trigger.dataset[field]) {
-                        input.value = trigger.dataset[field];
-                    }
-                });
+    modal.addEventListener('show.bs.modal', event => {
+        const button = event.relatedTarget;
+        const mode = button.getAttribute('data-mode');
+        const action = button.getAttribute('data-action') || '';
 
-                // Atualizar a exibição do texto do equipamento
-                // let span = form.querySelector('.equipamento-info');
-                // if (span) {
-                //     let patrimonioInput = form.querySelector('input[name="patrimonio"]');
-                //     let marcaInput = form.querySelector('input[name="marca"]');
-                //     let modeloInput = form.querySelector('input[name="modelo"]');
+    // Limpa o form
+    form.reset();
+    form.action = action;
+    form.querySelectorAll('input, select, textarea').forEach(el => el.removeAttribute('readonly'));
+    btnSalvar.style.display = 'inline-block';
+    btnSalvar.disabled = false;
 
-                //     let displayText = patrimonioInput.value || '';
-                //     if (marcaInput.value) displayText += ' - ' + marcaInput.value;
-                //     if (modeloInput.value) displayText += ' ' + modeloInput.value;
-                    
-                //     span.textContent = displayText;
-                // }
-            }
-
-            // definir data padrão se vazio
-            let dataInput = form.querySelector('input[name="data_suporte"]');
-            if (dataInput && !dataInput.value) {
-                let today = new Date().toISOString().slice(0,10);
-                dataInput.value = today;
-            }
-
-            let first = form.querySelector('input, select, textarea');
-            if (first) first.focus();
-        });
+    // Preenche campos se for edição ou visualização
+    if (mode === 'edit' || mode === 'view') {
+      ['id', 'data_suporte', 'tipo_suporte', 'responsavel', 'custo', 'descricao'].forEach(field => {
+        const input = form.querySelector(`[name="${field}"]`);
+        if (input && button.dataset[field]) {
+            input.value = button.dataset[field];
+        }
+      });
     }
+
+    // Ajusta título e comportamento
+    if (mode === 'create') {
+        title.textContent = 'Registrar Suporte';
+    } else if (mode === 'edit') {
+        title.textContent = 'Editar Suporte';
+    } else if (mode === 'view') {
+        title.textContent = 'Detalhes do Suporte';
+        form.querySelectorAll('input, select, textarea').forEach(el => el.setAttribute('readonly', true));
+        btnSalvar.style.display = 'none';
+    }
+    });
 });

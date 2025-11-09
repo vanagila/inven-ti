@@ -107,14 +107,37 @@
                                         -
                                     {% endif %}
                                 </td>
-                                <td>{{ registro.tipo_suporte }}</td>
+                                <td><i class="fa-solid fa-screwdriver-wrench"></i> {{ registro.tipo_suporte }}</td>
                                 <td>{{ registro.responsavel }}</td>
                                 <td>{{ registro.data_suporte.strftime('%d-%m-%Y') if registro.data_suporte else '' }}</td>
                                 <td>R${{ "%.2f"|format(registro.custo) }}</td>
                                 <td class="text-center table-actions">
-                                    <button class="btn btn-outline-secondary btn-sm" title="Ver"><i class="fa-solid fa-eye"></i>
+                                    <button class="btn btn-outline-secondary btn-sm btn-suporte"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#modalSuporte"
+                                        data-mode="view"
+                                        data-id="{{ registro.id }}"
+                                        data-data_suporte="{{ registro.data_suporte.strftime('%Y-%m-%d') }}"
+                                        data-tipo_suporte="{{ registro.tipo_suporte }}"
+                                        data-responsavel="{{ registro.responsavel }}"
+                                        data-custo="{{ registro.custo }}"
+                                        data-descricao="{{ registro.descricao }}">
+                                        <i class="fa-solid fa-eye"></i>
                                     </button>
-                                    <button class="btn btn-outline-secondary btn-sm btn-edit" data-bs-toggle="modal" data-bs-target="#modalEditar" title="Editar"><i class="fa-solid fa-pencil"></i></button>
+
+                                    <button class="btn btn-outline-secondary btn-sm btn-suporte"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#modalSuporte"
+                                        data-mode="edit"
+                                        data-action="{{ url_for('registro_suporte.atualizar_suporte', id=registro.id) }}"
+                                        data-id="{{ registro.id }}"
+                                        data-data_suporte="{{ registro.data_suporte.strftime('%Y-%m-%d') }}"
+                                        data-tipo_suporte="{{ registro.tipo_suporte }}"
+                                        data-responsavel="{{ registro.responsavel }}"
+                                        data-custo="{{ registro.custo }}"
+                                        data-descricao="{{ registro.descricao }}">
+                                        <i class="fa-solid fa-pencil"></i>
+                                    </button>
                                 </td>
                             </tr>
                             {% else %}
@@ -126,103 +149,126 @@
                     </table>
 
                     <!-- Paginação -->
-                    <div class="d-flex justify-content-between align-items-center mt-2">
-                        <span class="text-muted" style="font-size:.9rem;">Mostrando {{ pagination.page * pagination.per_page - pagination.per_page + 1 }}-{{ [pagination.page * pagination.per_page, pagination.total] | min }} de {{ pagination.total }} resultados</span>
-                        <nav>
-                            <ul class="pagination pagination-sm mb-0">
-                                {% if pagination.has_prev %}
-                                <li class="page-item">
-                                    <a class="page-link" href="{{ url_for('equipamento.listar_equipamentos', page=pagination.prev_num, **filtros) }}">Anterior</a>
-                                </li>
-                                {% endif %}
-                                {% for page_num in pagination.iter_pages() %}
-                                <li class="page-item {{ 'active' if page_num == pagination.page }}">
-                                    <a class="page-link" href="{{ url_for('equipamento.listar_equipamentos', page=page_num, **filtros) }}">{{ page_num }}</a>
-                                </li>
-                                {% endfor %}
-                                {% if pagination.has_next %}
-                                <li class="page-item">
-                                    <a class="page-link" href="{{ url_for('equipamento.listar_equipamentos', page=pagination.next_num, **filtros) }}">Próxima</a>
-                                </li>
-                                {% endif %}
-                            </ul>
-                        </nav>
-                    </div>
+                    {% if pagination %}
+                        <div class="d-flex justify-content-between align-items-center mt-2">
+                            <span class="text-muted" style="font-size:.9rem;">Mostrando {{ pagination.page * pagination.per_page - pagination.per_page + 1 }}-{{ [pagination.page * pagination.per_page, pagination.total] | min }} de {{ pagination.total }} resultados</span>
+                            <nav>
+                                <ul class="pagination pagination-sm mb-0">
+                                    {% if pagination.has_prev %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="{{ url_for('registro_suporte.listar_registros', page=pagination.prev_num, **filtros) }}">Anterior</a>
+                                    </li>
+                                    {% endif %}
+                                    {% for page_num in pagination.iter_pages() %}
+                                    <li class="page-item {{ 'active' if page_num == pagination.page }}">
+                                        <a class="page-link" href="{{ url_for('registro_suporte.listar_registros', page=page_num, **filtros) }}">{{ page_num }}</a>
+                                    </li>
+                                    {% endfor %}
+                                    {% if pagination.has_next %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="{{ url_for('registro_suporte.listar_registros', page=pagination.next_num, **filtros) }}">Próxima</a>
+                                    </li>
+                                    {% endif %}
+                                </ul>
+                            </nav>
+                        </div>
+                    {% endif %}
                 </div>
 
                 <!-- Mobile (cards) -->
                 <div class="d-block d-md-none">
                     {% for registro in registros %}
-                    <div class="panel-card">
-                        <div>
-                            <strong>
-                                {% if registro.equipamento %}
-                                {{ registro.equipamento.patrimonio }} - {{ registro.equipamento.marca }} {{ registro.equipamento.modelo }}
-                                {% else %}
-                                -
-                                {% endif %}
-                            </strong>
-                        </div>
-                        <div class="top-row">
-                            <div class="equip-name">
-                                <i class="fa-solid fa-screwdriver-wrench"></i> {{ registro.tipo_suporte }}
+                        <div class="panel-card">
+                            <div>
+                                <strong>
+                                    {% if registro.equipamento %}
+                                    {{ registro.equipamento.patrimonio }} - {{ registro.equipamento.marca }} {{ registro.equipamento.modelo }}
+                                    {% else %}
+                                    -
+                                    {% endif %}
+                                </strong>
                             </div>
-                            <div class="meta">{{ registro.data_suporte.strftime('%d-%m-%Y') if registro.data_suporte else '' }}
+                            <div class="top-row">
+                                <div class="equip-name">
+                                    <i class="fa-solid fa-screwdriver-wrench"></i> {{ registro.tipo_suporte }}
+                                </div>
+                                <div class="meta">{{ registro.data_suporte.strftime('%d-%m-%Y') if registro.data_suporte else '' }}
+                                </div>
+                            </div>
+                            <div class="desc">
+                                <strong>Responsável:</strong> {{ registro.responsavel }}
+                            </div>
+                            <div class="desc">
+                                <strong>Custo:</strong> R${{ "%.2f"|format(registro.custo) }}
+                            </div>
+                            <div class="d-flex gap-2 mt-2">
+                                <button class="btn btn-outline-secondary btn-sm btn-suporte"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#modalSuporte"
+                                    data-mode="view"
+                                    data-id="{{ registro.id }}"
+                                    data-data_suporte="{{ registro.data_suporte.strftime('%Y-%m-%d') }}"
+                                    data-tipo_suporte="{{ registro.tipo_suporte }}"
+                                    data-responsavel="{{ registro.responsavel }}"
+                                    data-custo="{{ registro.custo }}"
+                                    data-descricao="{{ registro.descricao }}">
+                                    <i class="fa-solid fa-eye"></i>
+                                </button>
+
+                                <button class="btn btn-outline-secondary btn-sm btn-suporte"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#modalSuporte"
+                                    data-mode="edit"
+                                    data-action="{{ url_for('registro_suporte.atualizar_suporte', id=registro.id) }}"
+                                    data-id="{{ registro.id }}"
+                                    data-data_suporte="{{ registro.data_suporte.strftime('%Y-%m-%d') }}"
+                                    data-tipo_suporte="{{ registro.tipo_suporte }}"
+                                    data-responsavel="{{ registro.responsavel }}"
+                                    data-custo="{{ registro.custo }}"
+                                    data-descricao="{{ registro.descricao }}">
+                                    <i class="fa-solid fa-pencil"></i>
+                                </button>
                             </div>
                         </div>
-                        <div class="desc">
-                            <strong>Responsável:</strong> {{ registro.responsavel }}
-                        </div>
-                        <div class="desc">
-                            <strong>Custo:</strong> R${{ "%.2f"|format(registro.custo) }}
-                        </div>
-                        <div class="d-flex gap-2 mt-2">
-                            <button class="btn btn-outline-secondary btn-sm"><i class="fa-solid fa-eye"></i></button>
-                            <button class="btn btn-outline-secondary btn-sm"><i class="fa-solid fa-pen"></i></button>
-                        </div>
-                    </div>
-                    {% else %}
-                    <p class="text-muted text-center">Nenhum registro encontrado.</p>
+                        {% else %}
+                        <p class="text-muted text-center">Nenhum registro encontrado.</p>
                     {% endfor %}
                     
                     <!-- Paginação (mobile) -->
-                    <div class="d-flex justify-content-between align-items-center mt-2">
-                        <span class="text-muted" style="font-size:.9rem;">Mostrando {{ pagination.page * pagination.per_page - pagination.per_page + 1 }}-{{ [pagination.page * pagination.per_page, pagination.total] | min }} de {{ pagination.total }} resultados</span>
-                        <nav>
-                            <ul class="pagination pagination-sm mb-0">
-                                {% if pagination.has_prev %}
-                                <li class="page-item">
-                                    <a class="page-link" href="{{ url_for('equipamento.listar_equipamentos', page=pagination.prev_num, **filtros) }}">
-                                        <i class="fa-solid fa-chevron-left"></i>
-                                    </a>
-                                </li>
-                                {% endif %}
-                                {% for page_num in pagination.iter_pages() %}
-                                <li class="page-item {{ 'active' if page_num == pagination.page }}">
-                                    <a class="page-link" href="{{ url_for('equipamento.listar_equipamentos', page=page_num, **filtros) }}">{{ page_num }}</a>
-                                </li>
-                                {% endfor %}
-                                {% if pagination.has_next %}
-                                <li class="page-item">
-                                    <a class="page-link" href="{{ url_for('equipamento.listar_equipamentos', page=pagination.next_num, **filtros) }}">
-                                        <i class="fa-solid fa-chevron-right"></i>
-                                    </a>
-                                </li>
-                                {% endif %}
-                            </ul>
-                        </nav>
-                    </div>
+                    {% if pagination %}
+                        <div class="d-flex justify-content-between align-items-center mt-2">
+                            <span class="text-muted" style="font-size:.9rem;">Mostrando {{ pagination.page * pagination.per_page - pagination.per_page + 1 }}-{{ [pagination.page * pagination.per_page, pagination.total] | min }} de {{ pagination.total }} resultados</span>
+                            <nav>
+                                <ul class="pagination pagination-sm mb-0">
+                                    {% if pagination.has_prev %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="{{ url_for('registro_suporte.listar_registros', page=pagination.prev_num, **filtros) }}">
+                                            <i class="fa-solid fa-chevron-left"></i>
+                                        </a>
+                                    </li>
+                                    {% endif %}
+                                    {% for page_num in pagination.iter_pages() %}
+                                    <li class="page-item {{ 'active' if page_num == pagination.page }}">
+                                        <a class="page-link" href="{{ url_for('registro_suporte.listar_registros', page=page_num, **filtros) }}">{{ page_num }}</a>
+                                    </li>
+                                    {% endfor %}
+                                    {% if pagination.has_next %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="{{ url_for('registro_suporte.listar_registros', page=pagination.next_num, **filtros) }}">
+                                            <i class="fa-solid fa-chevron-right"></i>
+                                        </a>
+                                    </li>
+                                    {% endif %}
+                                </ul>
+                            </nav>
+                        </div>
+                    {% endif %}
                 </div>
             </div>
         </div>
 
-        {# Modal de visualização #}
+        {# Modal de suporte #}
         {% set modal_id = 'modalNovoSuporte' %}
-        {% include 'partials/_modal-suporte.html' with context %}
-
-        {# Modal de edição #}
-        {% set modal_id = 'modalEditar' %}
-        {% set modal_title = 'Editar Suporte' %}
         {% include 'partials/_modal-suporte.html' with context %}
     </div>
 {% endblock %}

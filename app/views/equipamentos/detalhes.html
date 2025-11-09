@@ -98,13 +98,13 @@
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h6 class="section-title mb-0">Histórico de Suporte</h6>
-                    <button type="button" class="btn btn-dark fw-semibold btn-open-suporte"
-                            data-bs-toggle="modal" data-bs-target="#modalNovoSuporte"
-                            data-id="{{ equipamento.id }}"
-                            data-patrimonio="{{ equipamento.patrimonio }}"
-                            data-marca="{{ equipamento.marca }}"
-                            data-modelo="{{ equipamento.modelo }}">
-                        <i class="fa-solid fa-plus me-1"></i>Novo Suporte
+                    <button class="btn btn-dark fw-semibold btn-suporte" 
+                        data-bs-toggle="modal"
+                        data-bs-target="#modalSuporte"
+                        data-mode="create"
+                        data-action="{{ url_for('registro_suporte.registrar_suporte') }}"
+                        data-id-equipamento="{{ equipamento.id }}">
+                        <i class="fa-solid fa-plus"></i> Novo Suporte
                     </button>
                 </div>
 
@@ -131,13 +131,37 @@
                                         -
                                     {% endif %}
                                 </td>
-                                <td>{{ registro.tipo_suporte }}</td>
+                                <td><i class="fa-solid fa-screwdriver-wrench"></i> {{ registro.tipo_suporte }}</td>
                                 <td>{{ registro.responsavel }}</td>
                                 <td>{{ registro.data_suporte.strftime('%d-%m-%Y') if registro.data_suporte else '' }}</td>
                                 <td>R${{ "%.2f"|format(registro.custo) }}</td>
                                 <td class="text-center table-actions">
-                                    <button class="btn btn-outline-secondary btn-sm" title="Ver"><i class="fa-solid fa-eye"></i></button>
-                                    <button class="btn btn-outline-secondary btn-sm" title="Editar"><i class="fa-solid fa-pencil"></i></button>
+                                    <button class="btn btn-outline-secondary btn-sm btn-suporte"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#modalSuporte"
+                                        data-mode="view"
+                                        data-id="{{ registro.id }}"
+                                        data-data_suporte="{{ registro.data_suporte.strftime('%Y-%m-%d') }}"
+                                        data-tipo_suporte="{{ registro.tipo_suporte }}"
+                                        data-responsavel="{{ registro.responsavel }}"
+                                        data-custo="{{ registro.custo }}"
+                                        data-descricao="{{ registro.descricao }}">
+                                        <i class="fa-solid fa-eye"></i>
+                                    </button>
+
+                                    <button class="btn btn-outline-secondary btn-sm btn-suporte"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#modalSuporte"
+                                        data-mode="edit"
+                                        data-action="{{ url_for('registro_suporte.atualizar_suporte', id=registro.id) }}"
+                                        data-id="{{ registro.id }}"
+                                        data-data_suporte="{{ registro.data_suporte.strftime('%Y-%m-%d') }}"
+                                        data-tipo_suporte="{{ registro.tipo_suporte }}"
+                                        data-responsavel="{{ registro.responsavel }}"
+                                        data-custo="{{ registro.custo }}"
+                                        data-descricao="{{ registro.descricao }}">
+                                        <i class="fa-solid fa-pencil"></i>
+                                    </button>
                                 </td>
                             </tr>
                             {% else %}
@@ -176,8 +200,32 @@
                             <strong>Custo:</strong> R${{ "%.2f"|format(registro.custo) }}
                         </div>
                         <div class="d-flex gap-2 mt-2">
-                            <button class="btn btn-outline-secondary btn-sm"><i class="fa-solid fa-eye"></i></button>
-                            <button class="btn btn-outline-secondary btn-sm"><i class="fa-solid fa-pen"></i></button>
+                            <button class="btn btn-outline-secondary btn-sm btn-suporte"
+                                data-bs-toggle="modal"
+                                data-bs-target="#modalSuporte"
+                                data-mode="view"
+                                data-id="{{ registro.id }}"
+                                data-data_suporte="{{ registro.data_suporte.strftime('%Y-%m-%d') }}"
+                                data-tipo_suporte="{{ registro.tipo_suporte }}"
+                                data-responsavel="{{ registro.responsavel }}"
+                                data-custo="{{ registro.custo }}"
+                                data-descricao="{{ registro.descricao }}">
+                                <i class="fa-solid fa-eye"></i>
+                            </button>
+
+                            <button class="btn btn-outline-secondary btn-sm btn-suporte"
+                                data-bs-toggle="modal"
+                                data-bs-target="#modalSuporte"
+                                data-mode="edit"
+                                data-action="{{ url_for('registro_suporte.atualizar_suporte', id=registro.id) }}"
+                                data-id="{{ registro.id }}"
+                                data-data_suporte="{{ registro.data_suporte.strftime('%Y-%m-%d') }}"
+                                data-tipo_suporte="{{ registro.tipo_suporte }}"
+                                data-responsavel="{{ registro.responsavel }}"
+                                data-custo="{{ registro.custo }}"
+                                data-descricao="{{ registro.descricao }}">
+                                <i class="fa-solid fa-pencil"></i>
+                            </button>
                         </div>
                     </div>
                     {% else %}
@@ -188,7 +236,7 @@
         </div>
     </div>
 
-    {# Modal de criação #}
+    {# Modal de suporte #}
     {% set modal_id = 'modalNovoSuporte' %}
     {% include 'partials/_modal-suporte.html' with context %}
     
