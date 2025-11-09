@@ -154,11 +154,6 @@
         text-overflow: ellipsis;
         margin-bottom: .25rem;
     }
-    
-    .panel-card .meta {
-        font-size: .8rem;
-        color:  var(--text-muted);
-    }
 
     .btn-full {
         width: 100%;

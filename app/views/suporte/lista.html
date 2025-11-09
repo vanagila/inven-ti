@@ -179,21 +179,19 @@
                 <div class="d-block d-md-none">
                     {% for registro in registros %}
                         <div class="panel-card">
-                            <div>
-                                <strong>
-                                    {% if registro.equipamento %}
-                                    {{ registro.equipamento.patrimonio }} - {{ registro.equipamento.marca }} {{ registro.equipamento.modelo }}
-                                    {% else %}
-                                    -
-                                    {% endif %}
-                                </strong>
+                            <div class="title fw-semibold">
+                                {% if registro.equipamento %}
+                                {{ registro.equipamento.patrimonio }} - {{ registro.equipamento.marca }} {{ registro.equipamento.modelo }}
+                                {% else %}
+                                -
+                                {% endif %}
                             </div>
-                            <div class="top-row">
-                                <div class="equip-name">
-                                    <i class="fa-solid fa-screwdriver-wrench"></i> {{ registro.tipo_suporte }}
-                                </div>
-                                <div class="meta">{{ registro.data_suporte.strftime('%d-%m-%Y') if registro.data_suporte else '' }}
-                                </div>
+                            <div class="equip-name">
+                                <i class="fa-solid fa-screwdriver-wrench"></i> {{ registro.tipo_suporte }}
+                            </div>
+                            <div class="desc">
+                                <strong>Data:</strong>
+                                {{ registro.data_suporte.strftime('%d-%m-%Y') if registro.data_suporte else '' }}
                             </div>
                             <div class="desc">
                                 <strong>Responsável:</strong> {{ registro.responsavel }}
