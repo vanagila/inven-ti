@@ -6,10 +6,12 @@ from datetime import datetime
 from app.models.enums import StatusEquipamento
 from app.models.enums import TipoSuporte
 from sqlalchemy import func, or_
+from app.decorators import admin_required, login_required
 
 equipamento_bp = Blueprint('equipamento', __name__, url_prefix='/equipamentos')
 
 @equipamento_bp.route('/', methods=['GET', 'POST'])
+@admin_required
 def cadastrar_equipamento():
     if request.method == 'GET':
         return render_template('equipamentos/cadastro.html', status_options=StatusEquipamento.todos())
@@ -58,6 +60,7 @@ def cadastrar_equipamento():
             return redirect(url_for('equipamento.cadastrar_equipamento'))
         
 @equipamento_bp.route('/lista', methods=['GET'])
+@login_required
 def listar_equipamentos():
     try:
         tipo = request.args.get('tipo')
@@ -133,6 +136,7 @@ def listar_equipamentos():
         return render_template('equipamentos/lista.html', equipamentos=[], pagination=None, filtros={}, opcoes_filtros={})
 
 @equipamento_bp.route('/<int:id>', methods=['GET'])
+@login_required
 def consultar_equipamento(id):
     try:
         equipamento = Equipamento.query.get_or_404(id)
@@ -157,6 +161,7 @@ def consultar_equipamento(id):
             return redirect(url_for('equipamento.listar_equipamentos'))
         
 @equipamento_bp.route('/<int:id>/atualizar', methods=['PUT', 'POST'])
+@admin_required
 def atualizar_equipamento(id):
     try:
         equipamento = Equipamento.query.get_or_404(id)
@@ -204,6 +209,7 @@ def atualizar_equipamento(id):
             return redirect(url_for('equipamento.consultar_equipamento', id=id))
         
 @equipamento_bp.route('/<int:id>/desativar', methods=['POST', 'DELETE'])
+@admin_required
 def desativar_equipamento(id):
     try:
         equipamento = Equipamento.query.get_or_404(id)

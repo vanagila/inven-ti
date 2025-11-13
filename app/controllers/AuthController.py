@@ -4,10 +4,12 @@ from app.models import Equipamento
 from app.models.Usuario import Usuario
 import re
 from app.models.enums import StatusEquipamento
+from app.decorators import admin_required, login_required
 
 auth_bp = Blueprint('auth', __name__, url_prefix='/auth')
 
 @auth_bp.route('/cadastrar', methods=['GET', 'POST'])
+@admin_required
 def cadastrar_usuario():
     if request.method == 'POST':
         try:
@@ -125,6 +127,7 @@ def logout():
     return redirect(url_for('auth.login'))
 
 @auth_bp.route('/painel', methods=['GET'])
+@login_required
 def painel():
     try:
         total_equipamentos = Equipamento.query.count()
