@@ -6,10 +6,12 @@ from app.models.enums import TipoSuporte
 from datetime import datetime
 from sqlalchemy import or_, func
 from types import SimpleNamespace
+from app.decorators import admin_required, login_required
 
 registro_suporte_bp = Blueprint('registro_suporte', __name__, url_prefix='/registro-suporte')
 
 @registro_suporte_bp.route('/', methods=['GET', 'POST'])
+@admin_required
 def registrar_suporte():
     if request.method == 'GET':
         equipamentos = Equipamento.query.all()
@@ -56,6 +58,7 @@ def registrar_suporte():
             return redirect(url_for('registro_suporte.registrar_suporte', id_equipamento=dados.get('id_equipamento')))
         
 @registro_suporte_bp.route('/lista', methods=['GET'])
+@login_required
 def listar_registros():
     try:
         equipamento = request.args.get('equipamento')
@@ -151,6 +154,7 @@ def listar_registros():
             registros=[], pagination=fake_pagination, filtros={}, opcoes_filtros={})
 
 @registro_suporte_bp.route('/<int:id>/atualizar', methods=['PUT', 'POST'])
+@admin_required
 def atualizar_suporte(id):
     try:
         suporte = RegistroSuporte.query.get_or_404(id)
@@ -197,6 +201,7 @@ def atualizar_suporte(id):
             return redirect(url_for('registro_suporte.listar_registros', id=id))
 
 @registro_suporte_bp.route('/<int:id>', methods=['GET'])
+@login_required
 def consultar_suporte(id):
     try:
         suporte = RegistroSuporte.query.get_or_404(id)
