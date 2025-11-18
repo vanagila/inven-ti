@@ -133,7 +133,22 @@ def listar_equipamentos():
         if request.is_json:
             return jsonify({'erro': str(e)}), 500
         flash(f'Erro ao listar equipamentos: {str(e)}', 'danger')
-        return render_template('equipamentos/lista.html', equipamentos=[], pagination=None, filtros={}, opcoes_filtros={})
+
+        class DummyPagination:
+            def __init__(self):
+                self.page = 1
+                self.per_page = 5
+                self.total = 0
+                self.items = []
+                self.has_prev = False
+                self.has_next = False
+                self.prev_num = None
+                self.next_num = None
+                
+            def iter_pages(self):
+                return []
+
+        return render_template('equipamentos/lista.html', equipamentos=[], pagination=DummyPagination, filtros={}, opcoes_filtros={})
 
 @equipamento_bp.route('/<int:id>', methods=['GET'])
 @login_required
@@ -248,4 +263,17 @@ def desativar_equipamento(id):
             return jsonify({'erro': str(e)}), 400
         else:
             flash(f'Erro ao desativar equipamento: {str(e)}', 'danger')
-            return redirect(url_for('equipamento.consultar_equipamento', id=id)) 
+            return redirect(url_for('equipamento.consultar_equipamento', id=id))
+        
+@equipamento_bp.route('/exportar-csv')
+@login_required
+def exportar_csv():
+    try:
+        args = request.args.to_dict()
+
+        export_url = url_for('csv_export.exportar_equipamento_csv', **args)
+        return redirect(export_url)
+        
+    except Exception as e:
+        flash(f'Erro ao exportar CSV: {str(e)}', 'danger')
+        return redirect(url_for('equipamento.listar_equipamentos'))

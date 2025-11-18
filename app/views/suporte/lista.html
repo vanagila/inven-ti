@@ -173,6 +173,18 @@
                             </nav>
                         </div>
                     {% endif %}
+
+                    <div class="d-flex gap-2 mt-3">
+                        <a href="{{ url_for('registro_suporte.exportar_csv', 
+                                tipo=filtros.tipo, 
+                                status=filtros.status, 
+                                localizacao=filtros.localizacao, 
+                                marca=filtros.marca, 
+                                pesquisa=filtros.pesquisa) }}" 
+                            class="btn btn-outline-secondary">
+                            <i class="fa-solid fa-download"></i> Exportar CSV
+                        </a>
+                    </div>
                 </div>
 
                 <!-- Mobile (cards) -->
