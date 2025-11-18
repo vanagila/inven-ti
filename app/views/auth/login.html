@@ -1,18 +1,18 @@
 {% extends "base.html" %}
-{% block title %} Painel - invenTI {% endblock %}
+{% block title %} Login - invenTI {% endblock %}
 
 {% block content %}
 	<div class="auth-page">
         <div class="login-card">
 			{% with messages = get_flashed_messages(with_categories=true) %}
 				{% if messages %}
-				<div class="mb-3">
-					{% for category, message in messages %}
-					<div class="alert {% if category == 'success' %}alert-success{% else %}alert-danger{% endif %} text-center" role="alert">
-						{{ message }}
+					<div class="mb-3">
+						{% for category, message in messages %}
+							<div class="alert {% if category == 'success' %}alert-success{% else %}alert-danger{% endif %} text-center" role="alert">
+								{{ message }}
+							</div>
+						{% endfor %}
 					</div>
-					{% endfor %}
-				</div>
 				{% endif %}
 			{% endwith %}
             <div class="text-center mb-3">

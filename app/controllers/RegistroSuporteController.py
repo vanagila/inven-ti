@@ -224,3 +224,16 @@ def consultar_suporte(id):
         else:
             flash('suporte não encontrado.', 'danger')
             return redirect(url_for('suporte.listar_suportes'))
+        
+@registro_suporte_bp.route('/exportar-csv')
+@login_required
+def exportar_csv():
+    try:
+        args = request.args.to_dict()
+
+        export_url = url_for('csv_export.exportar_suporte_csv', **args)
+        return redirect(export_url)
+        
+    except Exception as e:
+        flash(f'Erro ao exportar CSV: {str(e)}', 'danger')
+        return redirect(url_for('registro_suporte.listar_registros'))
