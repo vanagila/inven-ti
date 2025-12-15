@@ -1,0 +1,76 @@
+@startuml Diagrama ER - Sistema invenTI
+
+' Configurações visuais
+skinparam backgroundColor #FEFEFE
+skinparam class {
+    BackgroundColor #FFFFFF
+    BorderColor #000000
+    BorderThickness 1
+    HeaderBackgroundColor #E1F5FE
+}
+
+' Entidades
+entity "Usuario" as Usuario {
+    + id : INTEGER <<PK>>
+    --
+    nome : VARCHAR(100)
+    email : VARCHAR(120) <<UK>>
+    senha_hash : VARCHAR(250)
+    departamento : VARCHAR(100)
+    cargo : VARCHAR(100)
+    is_admin : BOOLEAN
+    data_criacao : DATETIME
+    ativo : BOOLEAN
+}
+
+entity "Equipamento" as Equipamento {
+    + id : INTEGER <<PK>>
+    --
+    patrimonio : VARCHAR(255) <<UK>>
+    tipo : VARCHAR(100)
+    marca : VARCHAR(100)
+    modelo : VARCHAR(100)
+    numero_serie : VARCHAR(255) <<UK>>
+    data_aquisicao : DATE
+    localizacao : VARCHAR(255)
+    status : VARCHAR(50)
+    observacoes : TEXT
+    data_cadastro : DATETIME
+    data_ultima_alteracao : DATETIME
+    + id_usuario_cadastro : INTEGER <<FK>>
+    + id_usuario_ultima_alteracao : INTEGER <<FK>>
+}
+
+entity "RegistroSuporte" as RegistroSuporte {
+    + id : INTEGER <<PK>>
+    --
+    + id_equipamento : INTEGER <<FK>>
+    + id_usuario : INTEGER <<FK>>
+    descricao : TEXT
+    data_suporte : DATETIME
+    tipo_suporte : VARCHAR(100)
+    responsavel : VARCHAR(255)
+    custo : DECIMAL(10,2)
+}
+
+' Relacionamentos
+Usuario ||--o{ Equipamento : "cadastra"
+Usuario ||--o{ Equipamento : "altera"
+Usuario ||--o{ RegistroSuporte : "registra"
+Equipamento ||--o{ RegistroSuporte : "possui"
+
+' Notas explicativas
+note right of Usuario : Usuários do sistema\n(Admin/Comum)
+note right of Equipamento : Equipamentos de TI\ncom localização e status
+note right of RegistroSuporte : Histórico de\nmanutenção/suporte
+
+' Legendas
+legend right
+|= Tipo |= Descrição |
+| <<PK>> | Chave Primária |
+| <<FK>> | Chave Estrangeira |
+| <<UK>> | Chave Única |
+| ||--o{ | Um para Muitos |
+endlegend
+
+@enduml

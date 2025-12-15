@@ -1,3 +1,4 @@
+from operator import eq
 from flask import Blueprint, request, jsonify, render_template, redirect, url_for, session, flash
 from app.database.connection import db
 from app.models.Equipamento import Equipamento
@@ -120,7 +121,7 @@ def listar_equipamentos():
             filtros={
                 'tipo': tipo,
                 'status': status,
-                'tipo': localizacao,
+                'localizacao': localizacao,
                 'marca': marca,
                 'pesquisa': pesquisa
             },
@@ -148,7 +149,7 @@ def listar_equipamentos():
             def iter_pages(self):
                 return []
 
-        return render_template('equipamentos/lista.html', equipamentos=[], pagination=DummyPagination, filtros={}, opcoes_filtros={})
+        return render_template('equipamentos/lista.html', equipamentos=[], pagination=DummyPagination, filtros={}, opcoes_filtros={}, estatisticas={})
 
 @equipamento_bp.route('/<int:id>', methods=['GET'])
 @login_required
@@ -277,3 +278,15 @@ def exportar_csv():
     except Exception as e:
         flash(f'Erro ao exportar CSV: {str(e)}', 'danger')
         return redirect(url_for('equipamento.listar_equipamentos'))
+    
+@equipamento_bp.route('/estatisticas', methods=['GET'])
+@login_required
+def get_estatisticas():
+    try:
+        estatisticas = {
+            'status_counts': dict(db.session.query(Equipamento.status, func.count(Equipamento.id)).group_by(Equipamento.status).all())
+        }
+        return jsonify(estatisticas)
+    except Exception as e:
+        return jsonify({'erro': str(e)}), 400
+        

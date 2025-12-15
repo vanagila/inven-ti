@@ -1,5 +1,5 @@
-// scripts comuns para a aplicação
-// visualizar senha
+// Scripts comuns para a aplicação
+// Visualizar senha
 window.togglePassword = function() {
     var input = document.getElementById('senha');
     var icon = document.getElementById('toggleIcon');
@@ -87,4 +87,61 @@ document.addEventListener('DOMContentLoaded', function () {
         btnSalvar.style.display = 'none';
     }
     });
+});
+
+// Gráficos com Chartjs
+function inicializarGraficoStatus(dadosEstatisticas) {
+    const cores = [
+        '#6b7280', '#111827'
+    ];
+
+    const canvas = document.getElementById('statusChart');
+    if (!canvas) {
+        return;
+    }
+
+    if (dadosEstatisticas.status_counts && Object.keys(dadosEstatisticas.status_counts).length > 0) {
+        new Chart(canvas, {
+            type: 'pie',
+            data: {
+                labels: Object.keys(dadosEstatisticas.status_counts),
+                datasets: [{
+                    data: Object.values(dadosEstatisticas.status_counts),
+                    backgroundColor: cores,
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+    } else {
+        canvas.innerHTML = '<p class="text-muted text-center">Nenhum dado disponível</p>';
+    }
+}
+
+async function carregarEInicializarGraficos() {
+    try {
+        const response = await fetch('/equipamentos/estatisticas');
+        const dadosEstatisticas = await response.json();
+        
+        console.log('Dados recebidos da API:', dadosEstatisticas);
+        inicializarGraficoStatus(dadosEstatisticas);
+        
+    } catch (error) {
+        console.error('Erro ao carregar estatísticas:', error);
+        const canvas = document.getElementById('statusChart');
+        if (canvas) {
+            canvas.innerHTML = '<p class="text-muted text-center">Erro ao carregar dados</p>';
+        }
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    carregarEInicializarGraficos();
 });
