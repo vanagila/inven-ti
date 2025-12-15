@@ -1,53 +1,52 @@
 <div class="modal fade" id="modalSuporte" tabindex="-1" aria-labelledby="modalSuporteLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title fw-semibold" id="modalSuporteLabel">Registrar Suporte</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
-      </div>
+	<div class="modal-dialog modal-lg modal-dialog-centered">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title fw-semibold" id="modalSuporteLabel">Registrar Suporte</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+			</div>
 
-      <form id="formSuporte" method="POST" action="{{ url_for('registro_suporte.registrar_suporte') }}">
-        <div class="modal-body">
-          <input type="hidden" name="id_equipamento" id="id_equipamento" value="{{ equipamento.id if equipamento is defined else '' }}">
+			<form id="formSuporte" method="POST" action="{{ url_for('registro_suporte.registrar_suporte') }}">
+				<div class="modal-body">
+					<input type="hidden" name="id_equipamento" id="id_equipamento" value="{{ equipamento.id if equipamento is defined else '' }}">
+					<div class="row g-3">
+						<div class="col-md-6">
+							<label for="data_suporte" class="form-label">Data do Suporte*</label>
+							<input type="date" class="form-control" id="data_suporte" name="data_suporte" required>
+						</div>
 
-          <div class="row g-3">
-            <div class="col-md-6">
-              <label for="data_suporte" class="form-label">Data do Suporte*</label>
-              <input type="date" class="form-control" id="data_suporte" name="data_suporte" required>
-            </div>
+						<div class="col-md-6">
+							<label class="form-label" for="tipo_suporte">Tipo de Suporte*</label>
+							<select class="form-select" id="tipo_suporte" name="tipo_suporte" required>
+								<option value="">Selecionar</option>
+								{% for tipo in tipos_suporte %}
+								<option value="{{ tipo }}">{{ tipo }}</option>
+								{% endfor %}
+							</select>
+						</div>
 
-            <div class="col-md-6">
-              <label class="form-label" for="tipo_suporte">Tipo de Suporte*</label>
-              <select class="form-select" id="tipo_suporte" name="tipo_suporte" required>
-                <option value="">Selecionar</option>
-                {% for tipo in tipos_suporte %}
-                  <option value="{{ tipo }}">{{ tipo }}</option>
-                {% endfor %}
-              </select>
-            </div>
+						<div class="col-md-6">
+							<label class="form-label" for="responsavel">Responsável*</label>
+							<input type="text" class="form-control" name="responsavel" id="responsavel" required>
+						</div>
 
-            <div class="col-md-6">
-              <label class="form-label" for="responsavel">Responsável*</label>
-              <input type="text" class="form-control" name="responsavel" id="responsavel" required>
-            </div>
+						<div class="col-md-6">
+							<label class="form-label" for="custo">Custo*</label>
+							<input type="number" class="form-control" name="custo" id="custo" required>
+						</div>
 
-            <div class="col-md-6">
-              <label class="form-label" for="custo">Custo*</label>
-              <input type="number" class="form-control" name="custo" id="custo" required>
-            </div>
+						<div class="col-12">
+							<label class="form-label" for="descricao">Descrição</label>
+							<textarea class="form-control" id="descricao" name="descricao" rows="4" required></textarea>
+						</div>
+					</div>
+				</div>
 
-            <div class="col-12">
-              <label class="form-label" for="descricao">Descrição</label>
-              <textarea class="form-control" id="descricao" name="descricao" rows="4" required></textarea>
-            </div>
-          </div>
-        </div>
-
-        <div class="modal-footer">
-          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Fechar</button>
-          <button type="submit" class="btn btn-dark" id="btnSalvar">Salvar</button>
-        </div>
-      </form>
-    </div>
-  </div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Fechar</button>
+					<button type="submit" class="btn btn-dark" id="btnSalvar">Salvar</button>
+				</div>
+			</form>
+		</div>
+	</div>
 </div>
